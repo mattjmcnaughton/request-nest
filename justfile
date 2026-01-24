@@ -82,6 +82,18 @@ db-logs:
 db-shell:
     docker compose exec db psql -U request_nest -d request_nest
 
+# Generate a new migration
+db-migrate message:
+    uv run alembic revision --autogenerate -m "{{ message }}"
+
+# Apply pending migrations
+db-upgrade:
+    uv run alembic upgrade head
+
+# Revert the most recent migration
+db-downgrade:
+    uv run alembic downgrade -1
+
 # Build Docker image
 docker-build:
     docker build -t request-nest .

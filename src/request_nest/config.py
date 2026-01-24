@@ -4,11 +4,16 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
-    """Application settings loaded from environment variables."""
+    """Application settings loaded from environment variables.
+
+    All environment variables are prefixed with REQUEST_NEST_.
+    For example, REQUEST_NEST_HOST, REQUEST_NEST_PORT, etc.
+    """
 
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
+        env_prefix="REQUEST_NEST_",
         extra="ignore",
     )
 

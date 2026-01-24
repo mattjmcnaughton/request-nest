@@ -4,8 +4,9 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://request_nest:request_nest@db:5432/request_nest
-      - ADMIN_TOKEN=${ADMIN_TOKEN:-dev-token-change-me}
+      - REQUEST_NEST_DATABASE_URL=postgresql://request_nest:request_nest@db:5432/request_nest
+      - REQUEST_NEST_MIGRATION_DATABASE_URL=postgresql+psycopg://request_nest:request_nest@db:5432/request_nest
+      - REQUEST_NEST_ADMIN_TOKEN=${REQUEST_NEST_ADMIN_TOKEN:-dev-token-change-me}
     depends_on:
       db:
         condition: service_healthy
