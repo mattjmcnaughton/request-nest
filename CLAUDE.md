@@ -5,6 +5,9 @@
 - `just install` - Install dependencies
 - `just dev` - Run development server
 - `just db-up` - Start PostgreSQL database
+- `just db-migrate "message"` - Generate new migration
+- `just db-upgrade` - Apply pending migrations
+- `just db-downgrade` - Revert most recent migration
 - `just ci` - Run all CI checks
 - `just test` - Run tests
 - `just fix` - Auto-fix linting issues
@@ -44,14 +47,16 @@ Captured HTTP requests. Each event stores:
 ### Authentication
 - Admin API uses bearer token authentication
 - Ingest endpoints are public (no auth required)
-- Single `ADMIN_TOKEN` environment variable
+- Single `REQUEST_NEST_ADMIN_TOKEN` environment variable
 
 ## Database
 
 - PostgreSQL 16+ via asyncpg (async connection pool)
 - Direct SQL queries (no ORM)
 - Repository pattern for data access
-- Database URL: `DATABASE_URL` environment variable
+- Database migrations via Alembic (uses psycopg for sync operations)
+- Database URL: `REQUEST_NEST_DATABASE_URL` environment variable
+- Migration URL: `REQUEST_NEST_MIGRATION_DATABASE_URL` environment variable
 
 ## Conventions
 
@@ -61,6 +66,7 @@ Captured HTTP requests. Each event stores:
 - structlog for logging (snake_case events)
 - 100 char line length (project-specific, differs from template's 120)
 - Absolute imports only
+- All environment variables MUST use `REQUEST_NEST_` prefix (e.g., `REQUEST_NEST_HOST`, `REQUEST_NEST_PORT`)
 
 ## Key Patterns
 
@@ -86,17 +92,46 @@ async def save(self, db: Connection, event: Event) -> None:
 ### Configuration
 
 Application settings in `config.py` using pydantic-settings:
-- Environment variables automatically loaded
+- Environment variables automatically loaded with `REQUEST_NEST_` prefix
 - Type-safe configuration with validation
 - See `.env.example` for available settings
+- **IMPORTANT**: All new environment variables must use the `REQUEST_NEST_` prefix
+- Settings class is configured with `env_prefix="REQUEST_NEST_"` to enforce this convention
+
+## Database Migrations
+
+Migrations are managed with Alembic for schema version control.
+
+### Migration Commands
+
+- `just db-migrate "description"` - Generate a new migration file
+- `just db-upgrade` - Apply all pending migrations
+- `just db-downgrade` - Revert the most recent migration
+
+### Migration Workflow
+
+1. Make changes to your SQLAlchemy models (when models are added to the project)
+2. Generate migration: `just db-migrate "add users table"`
+3. Review the generated file in `alembic/versions/`
+4. Apply migration: `just db-upgrade`
+5. Verify with: `uv run alembic current`
+
+### Important Notes
+
+- All migrations must be reversible (implement both upgrade and downgrade)
+- This requirement is enforced per `.claude/rules/service/database.md`
+- Migrations use psycopg (sync) while the application uses asyncpg (async)
+- This separation keeps migration logic simple and maintainable
+- CI automatically runs migrations before tests
 
 ## Development Workflow
 
 1. Start database: `just db-up`
 2. Install dependencies: `just install`
-3. Run development server: `just dev`
-4. Run tests: `just test`
-5. Before committing: `just ci`
+3. Apply migrations: `just db-upgrade`
+4. Run development server: `just dev`
+5. Run tests: `just test`
+6. Before committing: `just ci`
 
 ## Docker
 
