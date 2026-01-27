@@ -7,7 +7,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 WORKDIR /app
 
 # Copy dependency files
-COPY pyproject.toml uv.lock* ./
+COPY README.md pyproject.toml uv.lock* ./
 
 # Install dependencies
 RUN --mount=type=cache,target=/root/.cache/uv \
