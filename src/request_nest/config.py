@@ -1,6 +1,16 @@
 """Application configuration via environment variables."""
 
+from enum import StrEnum
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Environment(StrEnum):
+    """Application environment."""
+
+    DEVELOPMENT = "development"
+    TEST = "test"
+    PRODUCTION = "production"
 
 
 class Settings(BaseSettings):
@@ -17,11 +27,23 @@ class Settings(BaseSettings):
         extra="ignore",
     )
 
+    # Environment
+    environment: Environment = Environment.DEVELOPMENT
+
     # Server
     host: str = "0.0.0.0"
     port: int = 8000
     debug: bool = False
     log_level: str = "INFO"
 
+    # Database
+    database_url: str
 
-settings = Settings()
+    # Authentication
+    admin_token: str = "dev-token-change-me"
+
+    # Request limits
+    max_body_size: int = 1048576  # 1MB default
+
+
+settings = Settings()  # type: ignore[missing-argument]  # pydantic-settings loads from env
