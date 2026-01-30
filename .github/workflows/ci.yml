@@ -87,4 +87,5 @@ jobs:
       - name: Run tests
         env:
           REQUEST_NEST_DATABASE_URL: postgresql://request_nest:request_nest@localhost:5432/request_nest
+          REQUEST_NEST_MIGRATION_DATABASE_URL: postgresql+psycopg://request_nest:request_nest@localhost:5432/request_nest
         run: uv run pytest --cov --cov-report=xml
