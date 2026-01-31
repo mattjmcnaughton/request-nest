@@ -26,13 +26,20 @@ target_metadata = None
 
 
 def get_url() -> str:
-    """Get database URL from environment variable.
+    """Get database URL from config or environment variable.
 
-    Uses REQUEST_NEST_MIGRATION_DATABASE_URL which includes the psycopg driver.
-    Note: Application uses asyncpg for async operations (REQUEST_NEST_DATABASE_URL),
-    but migrations use psycopg (sync) since migrations are one-off administrative
-    tasks that don't benefit from async performance characteristics.
+    First checks if sqlalchemy.url is set in alembic config (e.g., via set_main_option
+    for testing), then falls back to REQUEST_NEST_MIGRATION_DATABASE_URL environment
+    variable.
+
+    Uses psycopg driver for sync migrations (not asyncpg used by the application).
     """
+    # Check if URL was set via config (e.g., for testing)
+    config_url = config.get_main_option("sqlalchemy.url")
+    if config_url:
+        return config_url
+
+    # Fall back to environment variable
     url = os.getenv("REQUEST_NEST_MIGRATION_DATABASE_URL")
     if url is None:
         raise ValueError("REQUEST_NEST_MIGRATION_DATABASE_URL environment variable is not set")
