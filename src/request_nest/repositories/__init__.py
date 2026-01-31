@@ -1,3 +1,5 @@
 """Repositories for request-nest persistence."""
 
-__all__: list[str] = []
+from request_nest.repositories.bin_repository import BinRepository
+
+__all__ = ["BinRepository"]
