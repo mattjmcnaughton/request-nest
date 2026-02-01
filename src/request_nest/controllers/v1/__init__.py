@@ -1,3 +1,5 @@
 """API v1 controllers."""
 
-__all__: list[str] = []
+from request_nest.controllers.v1.bin_controller import BinController
+
+__all__ = ["BinController"]

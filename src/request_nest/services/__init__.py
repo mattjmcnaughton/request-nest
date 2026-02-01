@@ -1,3 +1,5 @@
 """Services for request-nest business logic."""
 
-__all__: list[str] = []
+from request_nest.services.bin_service import BinService
+
+__all__ = ["BinService"]
