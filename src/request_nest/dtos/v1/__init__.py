@@ -1,3 +1,5 @@
 """API v1 DTOs."""
 
-__all__: list[str] = []
+from request_nest.dtos.v1.bin_dto import BinListResponse, BinResponse, CreateBinRequest
+
+__all__ = ["BinListResponse", "BinResponse", "CreateBinRequest"]
