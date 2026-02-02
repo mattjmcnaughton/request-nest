@@ -2,6 +2,6 @@
 
 from request_nest.repositories.bin_repository import BinRepository
 from request_nest.repositories.event_repository import EventRepository
-from request_nest.repositories.protocols import BinRepositoryProtocol
+from request_nest.repositories.protocols import BinRepositoryProtocol, EventRepositoryProtocol
 
-__all__ = ["BinRepository", "BinRepositoryProtocol", "EventRepository"]
+__all__ = ["BinRepository", "BinRepositoryProtocol", "EventRepository", "EventRepositoryProtocol"]
