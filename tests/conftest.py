@@ -246,3 +246,22 @@ async def client(
         await engine.dispose()
     finally:
         drop_schema(schema_name)
+
+
+@pytest.fixture
+async def db_session(client: AsyncClient) -> AsyncGenerator:
+    """Create a database session for direct repository access in tests.
+
+    This fixture depends on the client fixture to ensure the database
+    and schema are properly set up. It provides access to the same
+    session factory used by the app.
+
+    Args:
+        client: The test client (used to ensure proper setup order).
+    """
+    # client argument ensures proper fixture dependency ordering
+    _ = client
+    from request_nest.main import app
+
+    async with app.state.async_session() as session:
+        yield session

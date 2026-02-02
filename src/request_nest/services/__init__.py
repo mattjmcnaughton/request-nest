@@ -1,5 +1,6 @@
 """Services for request-nest business logic."""
 
 from request_nest.services.bin_service import BinService
+from request_nest.services.event_service import EventService
 
-__all__ = ["BinService"]
+__all__ = ["BinService", "EventService"]
