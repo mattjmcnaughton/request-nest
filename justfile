@@ -19,9 +19,13 @@ dev:
 serve:
     uv run uvicorn request_nest.main:app --host 0.0.0.0 --port 8000
 
-# Run tests
+# Run tests (excludes performance tests)
 test *args:
-    uv run pytest {{ args }}
+    uv run pytest -m "not perf" {{ args }}
+
+# Run performance tests
+perf-test:
+    uv run pytest -m perf --tb=short -v
 
 # Run unit tests
 test-unit:

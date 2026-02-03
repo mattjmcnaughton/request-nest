@@ -57,6 +57,34 @@ class EventRepositoryProtocol(Protocol):
     Both EventRepository (real) and FakeEventRepository (test) implement this interface.
     """
 
+    async def create(
+        self,
+        session: Any,
+        bin_id: str,
+        method: str,
+        path: str,
+        query_params: dict,
+        headers: dict,
+        body_b64: str,
+        remote_ip: str | None = None,
+    ) -> Event:
+        """Create a new Event.
+
+        Args:
+            session: The database session (or fake equivalent).
+            bin_id: The ID of the parent bin.
+            method: HTTP method (GET, POST, etc.).
+            path: Request path after the bin URL.
+            query_params: URL query parameters.
+            headers: HTTP headers.
+            body_b64: Base64-encoded request body.
+            remote_ip: Client IP address, if available.
+
+        Returns:
+            The created Event.
+        """
+        ...
+
     async def get_by_id(self, session: Any, event_id: str) -> Event | None:
         """Retrieve an Event by its ID.
 
