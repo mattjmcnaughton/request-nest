@@ -13,6 +13,7 @@ from request_nest.config import settings
 from request_nest.db import create_engine, create_session_factory
 from request_nest.observability import setup_logging
 from request_nest.routes.v1 import v1_router
+from request_nest.routes.v1.ingest import router as ingest_router
 from request_nest.routes.web import web_router
 
 logger = structlog.get_logger()
@@ -46,6 +47,9 @@ app = FastAPI(
 
 # API v1 routes
 app.include_router(v1_router, prefix="/api/v1")
+
+# Ingest routes (public, no auth)
+app.include_router(ingest_router, prefix="/b", tags=["ingest"])
 
 # Web UI routes
 app.include_router(web_router)

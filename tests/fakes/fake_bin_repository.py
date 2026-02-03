@@ -24,11 +24,11 @@ class FakeBinRepository:
         """Clear all stored bins."""
         self._bins.clear()
 
-    async def create(self, _session: Any, name: str | None = None) -> Bin:
+    async def create(self, session: Any, name: str | None = None) -> Bin:  # noqa: ARG002
         """Create a new Bin and store it in memory.
 
         Args:
-            _session: Ignored (for interface compatibility).
+            session: Ignored (for interface compatibility).
             name: Optional human-readable name for the bin.
 
         Returns:
@@ -43,11 +43,11 @@ class FakeBinRepository:
         self._bins[bin_id] = bin_obj
         return bin_obj
 
-    async def get_by_id(self, _session: Any, bin_id: str) -> Bin | None:
+    async def get_by_id(self, session: Any, bin_id: str) -> Bin | None:  # noqa: ARG002
         """Retrieve a Bin by its ID.
 
         Args:
-            _session: Ignored (for interface compatibility).
+            session: Ignored (for interface compatibility).
             bin_id: The unique identifier of the bin.
 
         Returns:
@@ -55,11 +55,11 @@ class FakeBinRepository:
         """
         return self._bins.get(bin_id)
 
-    async def list_all(self, _session: Any) -> list[Bin]:
+    async def list_all(self, session: Any) -> list[Bin]:  # noqa: ARG002
         """Retrieve all Bins ordered by creation date (newest first).
 
         Args:
-            _session: Ignored (for interface compatibility).
+            session: Ignored (for interface compatibility).
 
         Returns:
             List of all Bins ordered by created_at descending.

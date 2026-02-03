@@ -70,6 +70,7 @@ markers = [
     "external: marks tests requiring external services",
     "integration: marks integration tests",
     "e2e: marks end-to-end tests",
+    "perf: marks performance tests (excluded from CI, run with 'just perf-test')",
 ]
 
 [tool.ruff]

@@ -4,7 +4,7 @@ from fastapi import HTTPException, status
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-__all__ = ["ErrorDetail", "ErrorResponse", "error_response", "not_found_error"]
+__all__ = ["ErrorDetail", "ErrorResponse", "error_response", "not_found_error", "payload_too_large_error"]
 
 
 class ErrorDetail(BaseModel):
@@ -50,4 +50,25 @@ def not_found_error(resource: str, resource_id: str) -> HTTPException:
     return HTTPException(
         status_code=status.HTTP_404_NOT_FOUND,
         detail={"error": {"code": "NOT_FOUND", "message": f"{resource} '{resource_id}' not found"}},
+    )
+
+
+def payload_too_large_error(max_size: int, actual_size: int) -> HTTPException:
+    """Create a 413 Payload Too Large HTTPException.
+
+    Args:
+        max_size: Maximum allowed body size in bytes.
+        actual_size: Actual body size in bytes.
+
+    Returns:
+        HTTPException with 413 status and error detail.
+    """
+    return HTTPException(
+        status_code=413,
+        detail={
+            "error": {
+                "code": "PAYLOAD_TOO_LARGE",
+                "message": f"Request body size ({actual_size} bytes) exceeds maximum allowed ({max_size} bytes)",
+            }
+        },
     )

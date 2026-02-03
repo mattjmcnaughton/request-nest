@@ -26,7 +26,7 @@ class FakeEventRepository:
 
     async def create(
         self,
-        _session: Any,
+        session: Any,  # noqa: ARG002
         bin_id: str,
         method: str,
         path: str,
@@ -38,7 +38,7 @@ class FakeEventRepository:
         """Create a new Event and store it in memory.
 
         Args:
-            _session: Ignored (for interface compatibility).
+            session: Ignored (for interface compatibility).
             bin_id: The ID of the parent bin.
             method: HTTP method.
             path: Request path.
@@ -65,11 +65,11 @@ class FakeEventRepository:
         self._events[event_id] = event
         return event
 
-    async def get_by_id(self, _session: Any, event_id: str) -> Event | None:
+    async def get_by_id(self, session: Any, event_id: str) -> Event | None:  # noqa: ARG002
         """Retrieve an Event by its ID.
 
         Args:
-            _session: Ignored (for interface compatibility).
+            session: Ignored (for interface compatibility).
             event_id: The unique identifier of the event.
 
         Returns:
@@ -77,11 +77,11 @@ class FakeEventRepository:
         """
         return self._events.get(event_id)
 
-    async def list_by_bin(self, _session: Any, bin_id: str, limit: int = 50) -> list[Event]:
+    async def list_by_bin(self, session: Any, bin_id: str, limit: int = 50) -> list[Event]:  # noqa: ARG002
         """Retrieve Events for a specific bin, ordered by creation date.
 
         Args:
-            _session: Ignored (for interface compatibility).
+            session: Ignored (for interface compatibility).
             bin_id: The ID of the bin to list events for.
             limit: Maximum number of events to return.
 
