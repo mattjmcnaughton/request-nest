@@ -26,7 +26,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None]:
     logger.info("application_started", app_name="request-nest", version=__version__)
 
     # Initialize database engine and session factory
-    engine = create_engine(settings.database_url)
+    engine = create_engine(settings.database_url, schema=settings.db_schema)
     app.state.db_engine = engine
     app.state.async_session = create_session_factory(engine)
 

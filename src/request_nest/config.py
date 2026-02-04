@@ -39,6 +39,7 @@ class Settings(BaseSettings):
 
     # Database
     database_url: str
+    db_schema: str | None = None  # PostgreSQL search_path schema (for test isolation)
 
     # Authentication
     admin_token: str = "dev-token-change-me"

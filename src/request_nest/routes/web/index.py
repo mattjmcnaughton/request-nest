@@ -1,26 +1,35 @@
-"""Index page route."""
+"""Web UI routes for serving the React SPA."""
 
 from __future__ import annotations
 
 from pathlib import Path
 
 from fastapi import APIRouter
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from starlette.requests import Request
+from fastapi.responses import FileResponse
 
 router = APIRouter()
 
-# Template configuration
-TEMPLATE_DIR = Path(__file__).parent.parent.parent / "web" / "templates"
-templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+# Path to the frontend build directory
+FRONTEND_DIR = Path(__file__).parent.parent.parent / "web" / "frontend" / "dist"
 
 
-@router.get("/", response_class=HTMLResponse)
-async def index(request: Request) -> HTMLResponse:
-    """Serve the index page."""
-    return templates.TemplateResponse(
-        request=request,
-        name="index.html",
-        context={"title": "Home"},
-    )
+@router.get("/")
+async def index() -> FileResponse:
+    """Serve the React SPA index page."""
+    return FileResponse(FRONTEND_DIR / "index.html")
+
+
+@router.get("/{path:path}")
+async def spa_fallback(path: str) -> FileResponse:
+    """SPA fallback - serve index.html for client-side routing.
+
+    This route handles all paths that don't match API or static asset routes,
+    allowing React Router to handle client-side navigation.
+    """
+    # Check if the path corresponds to a static file in the dist directory
+    static_file = FRONTEND_DIR / path
+    if static_file.is_file():
+        return FileResponse(static_file)
+
+    # Otherwise, serve index.html for client-side routing
+    return FileResponse(FRONTEND_DIR / "index.html")

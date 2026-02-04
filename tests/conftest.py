@@ -207,9 +207,6 @@ async def client(
     Requires a running PostgreSQL database.
     For unit tests without a database, use a minimal app fixture.
     """
-    from sqlalchemy import event
-    from sqlalchemy.pool import ConnectionPoolEntry
-
     from request_nest.db import create_engine, create_session_factory
     from request_nest.main import app
     from request_nest.observability import setup_logging
@@ -223,16 +220,9 @@ async def client(
         test_db_url = get_test_database_url()
         monkeypatch.setattr(settings, "database_url", test_db_url)
 
-        # Set up app with test database
+        # Set up app with test database and schema isolation
         setup_logging(settings.log_level)
-        engine = create_engine(test_db_url)
-
-        # Set search_path on every new connection from the pool
-        @event.listens_for(engine.sync_engine, "connect")
-        def set_search_path(dbapi_conn: ConnectionPoolEntry, _connection_record: object) -> None:
-            cursor = dbapi_conn.cursor()
-            cursor.execute(f'SET search_path TO "{schema_name}", public')
-            cursor.close()
+        engine = create_engine(test_db_url, schema=schema_name)
 
         app.state.db_engine = engine
         app.state.async_session = create_session_factory(engine)

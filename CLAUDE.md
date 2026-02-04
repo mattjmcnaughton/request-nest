@@ -2,15 +2,24 @@
 
 ## Quick Reference
 
-- `just install` - Install dependencies
-- `just dev` - Run development server
+- `just install` - Install backend dependencies
+- `just dev` - Run backend development server
 - `just db-up` - Start PostgreSQL database
 - `just db-migrate "message"` - Generate new migration
 - `just db-upgrade` - Apply pending migrations
 - `just db-downgrade` - Revert most recent migration
-- `just ci` - Run all CI checks
-- `just test` - Run tests
-- `just fix` - Auto-fix linting issues
+- `just ci` - Run all CI checks (backend + frontend)
+- `just test` - Run backend tests
+- `just fix` - Auto-fix backend linting issues
+
+### Frontend Commands
+
+- `just install-fe` - Install frontend dependencies (pnpm)
+- `just dev-fe` - Run Vite dev server (port 5173, proxies to backend)
+- `just build-fe` - Build frontend for production
+- `just test-fe` - Run frontend tests (Vitest)
+- `just lint-fe` - Run frontend linting (ESLint)
+- `just fix-fe` - Auto-fix frontend linting and formatting
 
 ## Project Overview
 
@@ -27,8 +36,12 @@ REST API using FastAPI with layered architecture:
 - `domain/` - Core business entities and models
 - `repositories/` - Data persistence layer (PostgreSQL via asyncpg)
 - `observability/` - Logging with structlog
-- `web/` - Static assets and templates for web UI
+- `web/frontend/` - React SPA (Vite + TypeScript + Tailwind)
 - `config.py` - Application settings (via pydantic-settings)
+
+### Frontend
+
+The web UI is a React single-page application served by FastAPI. See `src/request_nest/web/frontend/CLAUDE.md` for frontend-specific documentation.
 
 ## Key Concepts
 
@@ -127,11 +140,14 @@ Migrations are managed with Alembic for schema version control.
 ## Development Workflow
 
 1. Start database: `just db-up`
-2. Install dependencies: `just install`
+2. Install dependencies: `just install` and `just install-fe`
 3. Apply migrations: `just db-upgrade`
-4. Run development server: `just dev`
-5. Run tests: `just test`
-6. Before committing: `just ci`
+4. Run backend server: `just dev`
+5. Run frontend dev server (separate terminal): `just dev-fe`
+6. Run tests: `just test` and `just test-fe`
+7. Before committing: `just ci`
+
+For frontend development with hot reload, run both servers. Vite (port 5173) proxies API requests to FastAPI (port 8000). For production testing, build frontend (`just build-fe`) then run only FastAPI (`just dev`).
 
 ## Docker
 
@@ -143,4 +159,4 @@ Full stack with docker-compose:
 
 ## Before Committing
 
-Run `just ci` to verify all checks pass (linting, type checking, tests).
+Run `just ci` to verify all checks pass (backend linting, type checking, tests + frontend build, tests, linting).
