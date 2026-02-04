@@ -53,6 +53,7 @@ dev = [
     "pytest>=8.3.0",
     "pytest-asyncio>=0.24.0",
     "pytest-cov>=6.0.0",
+    "pytest-playwright>=0.6.0",
     "httpx>=0.28.0",
     "ruff>=0.8.0",
     "ty>=0.0.1a7",
@@ -71,6 +72,8 @@ markers = [
     "integration: marks integration tests",
     "e2e: marks end-to-end tests",
     "perf: marks performance tests (excluded from CI, run with 'just perf-test')",
+    "ui: marks UI tests",
+    "playwright: marks Playwright browser tests (excluded from CI, requires 'playwright install')",
 ]
 
 [tool.ruff]

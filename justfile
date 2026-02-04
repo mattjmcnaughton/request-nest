@@ -19,9 +19,9 @@ dev:
 serve:
     uv run uvicorn request_nest.main:app --host 0.0.0.0 --port 8000
 
-# Run tests (excludes performance tests)
+# Run tests (excludes performance and E2E tests)
 test *args:
-    uv run pytest -m "not perf" {{ args }}
+    uv run pytest -m "not perf" --ignore=tests/e2e/ {{ args }}
 
 # Run performance tests
 perf-test:
@@ -67,8 +67,8 @@ fix:
 # Quick check (lint + typecheck, no tests)
 check: lint format-check typecheck
 
-# Run all CI checks
-ci: lint format-check typecheck test
+# Run all CI checks (excludes E2E - run separately with `just test-e2e`)
+ci: lint format-check typecheck test build-fe test-fe lint-fe
 
 # Start PostgreSQL (via docker-compose)
 db-up:
@@ -110,7 +110,47 @@ up:
 down:
     docker compose down
 
+# Frontend directory
+frontend_dir := "src/request_nest/web/frontend"
+
+# Install frontend dependencies
+install-fe:
+    cd {{ frontend_dir }} && pnpm install
+
+# Run frontend dev server (with proxy to FastAPI on port 8000)
+dev-fe:
+    cd {{ frontend_dir }} && pnpm run dev
+
+# Build frontend for production
+build-fe:
+    cd {{ frontend_dir }} && pnpm run build
+
+# Run frontend tests (Vitest)
+test-fe:
+    cd {{ frontend_dir }} && pnpm test
+
+# Run frontend tests in watch mode
+test-fe-watch:
+    cd {{ frontend_dir }} && pnpm run test:watch
+
+# Run frontend linting (ESLint)
+lint-fe:
+    cd {{ frontend_dir }} && pnpm run lint
+
+# Fix frontend linting issues
+fix-fe:
+    cd {{ frontend_dir }} && pnpm run lint:fix && pnpm run format
+
+# Format frontend code (Prettier)
+format-fe:
+    cd {{ frontend_dir }} && pnpm run format
+
+# Check frontend formatting
+format-fe-check:
+    cd {{ frontend_dir }} && pnpm run format:check
+
 # Clean build artifacts
 clean:
     rm -rf .pytest_cache .ruff_cache .coverage htmlcov dist
+    rm -rf {{ frontend_dir }}/dist {{ frontend_dir }}/node_modules/.vite
     find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
