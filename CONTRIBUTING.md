@@ -98,7 +98,7 @@ Follow the layered architecture:
 
 - Version routes: `/api/v1/`, `/api/v2/` (when needed)
 - Use DTOs for request/response validation
-- Return consistent error format: `{"error": {"code": "...", "message": "..."}}`
+- Return consistent error format: `{"detail": {"error": {"code": "...", "message": "..."}}}`
 
 ## Commit Guidelines
 

@@ -54,14 +54,14 @@ Notes:
 Auth: `Authorization: Bearer <REQUEST_NEST_ADMIN_TOKEN>` for admin endpoints.
 
 ### Bins
-- `POST /api/bins`
+- `POST /api/v1/bins`
   - body: `{ "name": "optional" }`
   - response: `{ "id": "b_xxx", "ingest_url": "https://host/b/b_xxx" }`
 
-- `GET /api/bins`
+- `GET /api/v1/bins`
   - response: list of `{ id, created_at, name? }`
 
-- `GET /api/bins/:bin_id`
+- `GET /api/v1/bins/:bin_id`
   - response: `{ id, created_at, name? }`
 
 ### Ingest
@@ -71,10 +71,10 @@ Auth: `Authorization: Bearer <REQUEST_NEST_ADMIN_TOKEN>` for admin endpoints.
   - response: `{ "ok": true, "event_id": "e_xxx" }`
 
 ### Events
-- `GET /api/bins/:bin_id/events?limit=50`
+- `GET /api/v1/bins/:bin_id/events?limit=50`
   - response: list of `{ id, created_at, method, path, size_bytes }`
 
-- `GET /api/events/:event_id`
+- `GET /api/v1/events/:event_id`
   - response: full stored event payload
 
 ## UI (minimal)

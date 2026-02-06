@@ -65,7 +65,7 @@ Captured HTTP requests. Each event stores:
 ## Database
 
 - PostgreSQL 16+ via asyncpg (async connection pool)
-- Direct SQL queries (no ORM)
+- SQLModel (SQLAlchemy) for domain models; repositories use SQLAlchemy sessions
 - Repository pattern for data access
 - Database migrations via Alembic (uses psycopg for sync operations)
 - Database URL: `REQUEST_NEST_DATABASE_URL` environment variable
@@ -73,11 +73,11 @@ Captured HTTP requests. Each event stores:
 
 ## Conventions
 
-- Python 3.12+
+- Python 3.13+
 - Async for all I/O operations
 - Pydantic for all data structures
 - structlog for logging (snake_case events)
-- 100 char line length (project-specific, differs from template's 120)
+- 120 char line length
 - Absolute imports only
 - All environment variables MUST use `REQUEST_NEST_` prefix (e.g., `REQUEST_NEST_HOST`, `REQUEST_NEST_PORT`)
 
@@ -86,10 +86,10 @@ Captured HTTP requests. Each event stores:
 ### API Endpoints
 
 Admin API (requires auth):
-- `POST /api/bins` - Create new bin
-- `GET /api/bins` - List all bins
-- `GET /api/bins/{bin_id}/events` - List events for a bin
-- `GET /api/events/{event_id}` - Get event details
+- `POST /api/v1/bins` - Create new bin
+- `GET /api/v1/bins` - List all bins
+- `GET /api/v1/bins/{bin_id}/events` - List events for a bin
+- `GET /api/v1/events/{event_id}` - Get event details
 
 Ingest endpoints (no auth):
 - `ANY /b/{bin_id}/{path:path}` - Capture request to bin
