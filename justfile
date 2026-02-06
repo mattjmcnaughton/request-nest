@@ -15,6 +15,10 @@ install:
 dev:
     uv run uvicorn request_nest.main:app --reload --host 0.0.0.0 --port 8000
 
+# Run backend and frontend dev servers concurrently
+dev-all:
+    just dev & just dev-fe & wait
+
 # Run the production server
 serve:
     uv run uvicorn request_nest.main:app --host 0.0.0.0 --port 8000
@@ -154,3 +158,15 @@ clean:
     rm -rf .pytest_cache .ruff_cache .coverage htmlcov dist
     rm -rf {{ frontend_dir }}/dist {{ frontend_dir }}/node_modules/.vite
     find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+
+# Initialize worktree (for git worktree development)
+init-worktree:
+    #!/usr/bin/env bash
+    set -euo pipefail
+    base_repo="$(dirname "$(git rev-parse --git-common-dir)")"
+    cp .env.example .env
+    mkdir -p .claude
+    ln -sf "$base_repo/.claude/settings.local.json" .claude/settings.local.json
+    just install
+    just install-fe
+    just ci

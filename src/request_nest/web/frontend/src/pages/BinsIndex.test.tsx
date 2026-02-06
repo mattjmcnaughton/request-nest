@@ -55,7 +55,9 @@ describe("BinsIndex", () => {
           .mockImplementation(
             () => new Promise((resolve) => setTimeout(() => resolve([]), 500)),
           ),
+        getBin: vi.fn(),
         createBin: vi.fn(),
+        listEventsForBin: vi.fn(),
       };
 
       renderWithProviders(<BinsIndex />, { apiClient: slowClient });

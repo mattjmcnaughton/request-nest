@@ -1,14 +1,20 @@
+import { BrowserRouter, Routes, Route } from "react-router";
 import { ApiProvider } from "./contexts";
 import { RealBinApiClient } from "./api";
-import { BinsIndex } from "./pages";
+import { BinsIndex, BinDetail } from "./pages";
 
 const apiClient = new RealBinApiClient();
 
 function App() {
   return (
-    <ApiProvider client={apiClient}>
-      <BinsIndex />
-    </ApiProvider>
+    <BrowserRouter>
+      <ApiProvider client={apiClient}>
+        <Routes>
+          <Route path="/" element={<BinsIndex />} />
+          <Route path="/bins/:binId" element={<BinDetail />} />
+        </Routes>
+      </ApiProvider>
+    </BrowserRouter>
   );
 }
 

@@ -107,6 +107,8 @@ describe("CreateBinModal", () => {
     // Make createBin take some time
     const slowClient = {
       listBins: apiClient.listBins.bind(apiClient),
+      getBin: apiClient.getBin.bind(apiClient),
+      listEventsForBin: apiClient.listEventsForBin.bind(apiClient),
       createBin: vi
         .fn()
         .mockImplementation(

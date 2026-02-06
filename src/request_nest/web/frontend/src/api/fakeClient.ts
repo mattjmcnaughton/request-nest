@@ -1,5 +1,6 @@
 import type { BinApiClient } from "./client";
-import type { Bin } from "../types";
+import type { Bin, EventSummary } from "../types";
+import { ApiError } from "../types";
 
 /**
  * Generate a random ID similar to the backend's bin ID format.
@@ -17,17 +18,19 @@ function generateBinId(): string {
 /**
  * Fake API client for testing.
  *
- * This implementation stores bins in memory, matching the pattern
+ * This implementation stores bins and events in memory, matching the pattern
  * of FakeBinRepository in the backend tests.
  */
 export class FakeBinApiClient implements BinApiClient {
   private bins: Map<string, Bin> = new Map();
+  private events: Map<string, EventSummary[]> = new Map();
 
   /**
-   * Clear all stored bins. Call this between tests.
+   * Clear all stored bins and events. Call this between tests.
    */
   clear(): void {
     this.bins.clear();
+    this.events.clear();
   }
 
   /**
@@ -38,14 +41,47 @@ export class FakeBinApiClient implements BinApiClient {
   }
 
   /**
+   * Add an event to a bin (for test setup).
+   */
+  addEvent(binId: string, event: EventSummary): void {
+    const binEvents = this.events.get(binId) ?? [];
+    binEvents.push(event);
+    this.events.set(binId, binEvents);
+  }
+
+  /**
+   * Add multiple events to a bin (for test setup).
+   */
+  addEvents(binId: string, events: EventSummary[]): void {
+    for (const event of events) {
+      this.addEvent(binId, event);
+    }
+  }
+
+  /**
    * Get all bins (for test assertions).
    */
   getBins(): Bin[] {
     return Array.from(this.bins.values());
   }
 
+  /**
+   * Get events for a bin (for test assertions).
+   */
+  getEvents(binId: string): EventSummary[] {
+    return this.events.get(binId) ?? [];
+  }
+
   async listBins(): Promise<Bin[]> {
     return Array.from(this.bins.values());
+  }
+
+  async getBin(binId: string): Promise<Bin> {
+    const bin = this.bins.get(binId);
+    if (!bin) {
+      throw new ApiError("NOT_FOUND", `Bin ${binId} not found`, 404);
+    }
+    return bin;
   }
 
   async createBin(name: string | null): Promise<Bin> {
@@ -58,6 +94,10 @@ export class FakeBinApiClient implements BinApiClient {
     this.bins.set(bin.id, bin);
     return bin;
   }
+
+  async listEventsForBin(binId: string): Promise<EventSummary[]> {
+    return this.events.get(binId) ?? [];
+  }
 }
 
 /**
@@ -68,5 +108,18 @@ export function createFakeClientWithBins(bins: Bin[]): FakeBinApiClient {
   for (const bin of bins) {
     client.addBin(bin);
   }
+  return client;
+}
+
+/**
+ * Create a FakeApiClient pre-populated with a bin and its events.
+ */
+export function createFakeClientWithBinAndEvents(
+  bin: Bin,
+  events: EventSummary[],
+): FakeBinApiClient {
+  const client = new FakeBinApiClient();
+  client.addBin(bin);
+  client.addEvents(bin.id, events);
   return client;
 }
