@@ -1,5 +1,11 @@
 import type { BinApiClient } from "./client";
-import type { Bin, BinListResponse, ApiErrorResponse } from "../types";
+import type {
+  Bin,
+  BinListResponse,
+  EventSummary,
+  EventListResponse,
+  ApiErrorResponse,
+} from "../types";
 import { ApiError } from "../types";
 import { getToken } from "../utils/auth";
 
@@ -19,6 +25,11 @@ export class RealBinApiClient implements BinApiClient {
     return data.bins;
   }
 
+  async getBin(binId: string): Promise<Bin> {
+    const response = await this.fetch(`/bins/${binId}`);
+    return response.json();
+  }
+
   async createBin(name: string | null): Promise<Bin> {
     const response = await this.fetch("/bins", {
       method: "POST",
@@ -28,6 +39,12 @@ export class RealBinApiClient implements BinApiClient {
       body: JSON.stringify({ name }),
     });
     return response.json();
+  }
+
+  async listEventsForBin(binId: string): Promise<EventSummary[]> {
+    const response = await this.fetch(`/bins/${binId}/events`);
+    const data: EventListResponse = await response.json();
+    return data.events;
   }
 
   private async fetch(
