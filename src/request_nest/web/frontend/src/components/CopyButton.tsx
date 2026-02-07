@@ -21,11 +21,11 @@ export function CopyButton({ text, label = "to clipboard" }: CopyButtonProps) {
   return (
     <button
       onClick={handleCopy}
-      className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
+      className="inline-flex items-center px-2 py-1 font-mono text-xs text-gray-400 hover:text-emerald-400 hover:bg-gray-800 rounded transition-colors"
       title={`Copy ${label}`}
     >
       {copied ? (
-        <span className="text-green-600">Copied!</span>
+        <span className="text-emerald-400 font-mono text-xs">copied</span>
       ) : (
         <svg
           className="w-4 h-4"

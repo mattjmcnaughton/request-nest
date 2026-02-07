@@ -48,18 +48,21 @@ export function CreateBinModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4 z-50">
+      <div className="bg-gray-900 border border-gray-700 rounded max-w-md w-full p-6">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold text-gray-900">
-            Create New Bin
-          </h2>
+          <div className="flex items-center gap-2">
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-400"></span>
+            <h2 className="font-mono text-sm font-semibold text-gray-100">
+              new bin
+            </h2>
+          </div>
           <button
             onClick={handleClose}
-            className="text-gray-400 hover:text-gray-600 transition-colors"
+            className="text-gray-500 hover:text-gray-300 transition-colors"
           >
             <svg
-              className="w-6 h-6"
+              className="w-5 h-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -78,41 +81,41 @@ export function CreateBinModal({
           <div className="mb-4">
             <label
               htmlFor="bin-name"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block font-mono text-xs text-gray-500 mb-1"
             >
-              Name (optional)
+              name (optional)
             </label>
             <input
               type="text"
               id="bin-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="e.g., Stripe Webhooks"
+              className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded font-mono text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="e.g., stripe-webhooks"
               disabled={isSubmitting}
               autoFocus
             />
-            <p className="mt-1 text-sm text-gray-500">
-              Give your bin a name to help identify it later.
+            <p className="mt-1 font-mono text-xs text-gray-600">
+              Give your bin a name to identify it later.
             </p>
-            {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
+            {error && <p className="mt-2 font-mono text-xs text-red-400">{error}</p>}
           </div>
 
           <div className="flex gap-3 justify-end">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-2 text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors"
+              className="px-4 py-2 font-mono text-xs text-gray-400 bg-gray-800 border border-gray-700 rounded hover:bg-gray-700 focus:outline-none focus:ring-1 focus:ring-gray-500 transition-colors"
               disabled={isSubmitting}
             >
-              Cancel
+              cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 bg-emerald-600 text-gray-950 rounded font-mono text-xs font-semibold hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isSubmitting}
             >
-              {isSubmitting ? "Creating..." : "Create Bin"}
+              {isSubmitting ? "creating..." : "create"}
             </button>
           </div>
         </form>

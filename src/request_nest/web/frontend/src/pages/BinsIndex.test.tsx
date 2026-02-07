@@ -25,7 +25,7 @@ describe("BinsIndex", () => {
       clearToken();
       renderWithProviders(<BinsIndex />);
 
-      expect(screen.getByText("Authentication Required")).toBeInTheDocument();
+      expect(screen.getByText("auth required")).toBeInTheDocument();
     });
 
     it("fetches bins after authentication", async () => {
@@ -37,7 +37,7 @@ describe("BinsIndex", () => {
       renderWithProviders(<BinsIndex />, { apiClient });
 
       // Enter token
-      await user.type(screen.getByLabelText(/admin token/i), "my-token");
+      await user.type(screen.getByLabelText(/token/i), "my-token");
       await user.click(screen.getByRole("button", { name: /authenticate/i }));
 
       // Should now show bins (both mobile and desktop render, use getAllBy)
@@ -105,13 +105,13 @@ describe("BinsIndex", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole("button", { name: /create bin/i }),
+          screen.getByRole("button", { name: /new bin/i }),
         ).toBeInTheDocument();
       });
 
-      await user.click(screen.getByRole("button", { name: /create bin/i }));
+      await user.click(screen.getByRole("button", { name: /new bin/i }));
 
-      expect(screen.getByText("Create New Bin")).toBeInTheDocument();
+      expect(screen.getByText("new bin", { selector: "h2" })).toBeInTheDocument();
     });
 
     it("refreshes list after creating a bin", async () => {
@@ -126,15 +126,10 @@ describe("BinsIndex", () => {
       });
 
       // Open modal and create bin
-      await user.click(screen.getByRole("button", { name: /create bin/i }));
+      await user.click(screen.getByRole("button", { name: /new bin/i }));
       await user.type(screen.getByLabelText(/name/i), "New Webhook");
 
-      // There will be two "Create Bin" buttons - get the one with type="submit"
-      const buttons = screen.getAllByRole("button", { name: /create bin/i });
-      const modalSubmitButton = buttons.find(
-        (btn) => btn.getAttribute("type") === "submit",
-      );
-      await user.click(modalSubmitButton!);
+      await user.click(screen.getByRole("button", { name: /^create$/i }));
 
       // Should show the new bin (both layouts render)
       await waitFor(() => {
@@ -150,7 +145,7 @@ describe("BinsIndex", () => {
 
       await waitFor(() => {
         expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-          "request-nest",
+          "$ bins",
         );
       });
     });

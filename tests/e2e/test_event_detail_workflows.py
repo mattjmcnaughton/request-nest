@@ -26,9 +26,9 @@ class TestUserViewsEventDetail:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Event Detail Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Event Detail Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Navigate to bin detail
         expect(page.get_by_role("cell", name="Event Detail Bin")).to_be_visible()
@@ -36,7 +36,7 @@ class TestUserViewsEventDetail:
 
         # Wait for detail page to load and get ingest URL
         expect(page.get_by_role("heading", name="Event Detail Bin")).to_be_visible()
-        ingest_url_element = page.locator(".rounded-md.bg-gray-50 code")
+        ingest_url_element = page.locator("code").filter(has_text=re.compile(r"^http")).first
         ingest_url = ingest_url_element.inner_text()
 
         # Send a webhook with known content
@@ -68,16 +68,16 @@ class TestUserViewsEventDetail:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Headers Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Headers Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Navigate to bin detail
         expect(page.get_by_role("cell", name="Headers Bin")).to_be_visible()
         page.get_by_role("row", name=re.compile("Headers Bin")).click()
         expect(page.get_by_role("heading", name="Headers Bin")).to_be_visible()
 
-        ingest_url_element = page.locator(".rounded-md.bg-gray-50 code")
+        ingest_url_element = page.locator("code").filter(has_text=re.compile(r"^http")).first
         ingest_url = ingest_url_element.inner_text()
 
         # Send a webhook with a custom header
@@ -95,7 +95,7 @@ class TestUserViewsEventDetail:
         page.locator("table tr").filter(has_text="POST").first.click()
 
         # Verify headers section is displayed
-        expect(page.get_by_role("heading", name="Headers")).to_be_visible()
+        expect(page.get_by_role("heading", name="headers")).to_be_visible()
         expect(page.get_by_text("x-custom-header")).to_be_visible()
         expect(page.get_by_text("custom-value")).to_be_visible()
 
@@ -107,16 +107,16 @@ class TestUserViewsEventDetail:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("JSON Body Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("JSON Body Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Navigate to bin detail
         expect(page.get_by_role("cell", name="JSON Body Bin")).to_be_visible()
         page.get_by_role("row", name=re.compile("JSON Body Bin")).click()
         expect(page.get_by_role("heading", name="JSON Body Bin")).to_be_visible()
 
-        ingest_url_element = page.locator(".rounded-md.bg-gray-50 code")
+        ingest_url_element = page.locator("code").filter(has_text=re.compile(r"^http")).first
         ingest_url = ingest_url_element.inner_text()
 
         # Send a JSON webhook
@@ -134,7 +134,7 @@ class TestUserViewsEventDetail:
         page.locator("table tr").filter(has_text="POST").first.click()
 
         # Verify JSON body is shown with JSON label
-        expect(page.get_by_text("(JSON)")).to_be_visible()
+        expect(page.get_by_text("(json)")).to_be_visible()
         # Verify pretty-printed content in pre block
         pre = page.locator("pre")
         expect(pre).to_be_visible()
@@ -149,16 +149,16 @@ class TestUserViewsEventDetail:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Query Params Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Query Params Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Navigate to bin detail
         expect(page.get_by_role("cell", name="Query Params Bin")).to_be_visible()
         page.get_by_role("row", name=re.compile("Query Params Bin")).click()
         expect(page.get_by_role("heading", name="Query Params Bin")).to_be_visible()
 
-        ingest_url_element = page.locator(".rounded-md.bg-gray-50 code")
+        ingest_url_element = page.locator("code").filter(has_text=re.compile(r"^http")).first
         ingest_url = ingest_url_element.inner_text()
 
         # Send a webhook with query params
@@ -174,7 +174,7 @@ class TestUserViewsEventDetail:
         page.locator("table tr").filter(has_text="GET").first.click()
 
         # Verify query parameters section
-        expect(page.get_by_role("heading", name="Query Parameters")).to_be_visible()
+        expect(page.get_by_role("heading", name="query_params")).to_be_visible()
         expect(page.get_by_text("foo")).to_be_visible()
         expect(page.get_by_text("bar")).to_be_visible()
 
@@ -192,16 +192,16 @@ class TestEventDetailBreadcrumbNavigation:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Breadcrumb Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Breadcrumb Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Navigate to bin detail
         expect(page.get_by_role("cell", name="Breadcrumb Bin")).to_be_visible()
         page.get_by_role("row", name=re.compile("Breadcrumb Bin")).click()
         expect(page.get_by_role("heading", name="Breadcrumb Bin")).to_be_visible()
 
-        ingest_url_element = page.locator(".rounded-md.bg-gray-50 code")
+        ingest_url_element = page.locator("code").filter(has_text=re.compile(r"^http")).first
         ingest_url = ingest_url_element.inner_text()
 
         # Send a webhook
@@ -219,7 +219,7 @@ class TestEventDetailBreadcrumbNavigation:
 
         # Verify breadcrumb shows bin name
         breadcrumb = page.locator("nav")
-        expect(breadcrumb.get_by_role("link", name="Bins")).to_be_visible()
+        expect(breadcrumb.get_by_role("link", name="bins")).to_be_visible()
         expect(breadcrumb.get_by_role("link", name="Breadcrumb Bin")).to_be_visible()
 
         # Click breadcrumb to go back to bin detail
@@ -227,4 +227,4 @@ class TestEventDetailBreadcrumbNavigation:
 
         # Verify we're back on the bin detail page
         expect(page.get_by_role("heading", name="Breadcrumb Bin")).to_be_visible()
-        expect(page.get_by_text("Captured Events")).to_be_visible()
+        expect(page.get_by_text("$ events")).to_be_visible()

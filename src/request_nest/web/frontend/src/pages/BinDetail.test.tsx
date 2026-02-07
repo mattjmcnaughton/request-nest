@@ -45,7 +45,7 @@ describe("BinDetail", () => {
       renderBinDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Authentication Required")).toBeInTheDocument();
+        expect(screen.getByText("auth required")).toBeInTheDocument();
       });
     });
   });
@@ -86,14 +86,14 @@ describe("BinDetail", () => {
       });
     });
 
-    it("displays 'Unnamed Bin' for bins without name", async () => {
+    it("displays 'unnamed' for bins without name", async () => {
       const bin = createTestBin({ id: TEST_BIN_ID, name: null });
       const apiClient = createFakeClientWithBinAndEvents(bin, []);
 
       renderBinDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Unnamed Bin")).toBeInTheDocument();
+        expect(screen.getByText("unnamed")).toBeInTheDocument();
       });
     });
 
@@ -176,7 +176,7 @@ describe("BinDetail", () => {
       renderBinDetail(apiClient);
 
       await waitFor(() => {
-        const backLink = screen.getByRole("link", { name: /back to bins/i });
+        const backLink = screen.getByRole("link", { name: /cd \.\./ });
         expect(backLink).toHaveAttribute("href", "/");
       });
     });
@@ -197,7 +197,7 @@ describe("BinDetail", () => {
       const copyButton = screen.getByTitle("Copy to clipboard");
       await user.click(copyButton);
 
-      expect(screen.getByText("Copied!")).toBeInTheDocument();
+      expect(screen.getByText("copied")).toBeInTheDocument();
     });
   });
 
@@ -209,7 +209,7 @@ describe("BinDetail", () => {
       renderBinDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Bin Not Found")).toBeInTheDocument();
+        expect(screen.getByText("bin not found")).toBeInTheDocument();
         expect(
           screen.getByText(/does not exist or has been deleted/i),
         ).toBeInTheDocument();
@@ -222,7 +222,7 @@ describe("BinDetail", () => {
       renderBinDetail(apiClient);
 
       await waitFor(() => {
-        const backLink = screen.getByRole("link", { name: /back to bins list/i });
+        const backLink = screen.getByRole("link", { name: /back to bins/i });
         expect(backLink).toHaveAttribute("href", "/");
       });
     });
@@ -252,7 +252,7 @@ describe("BinDetail", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole("button", { name: /try again/i }),
+          screen.getByRole("button", { name: /retry/i }),
         ).toBeInTheDocument();
       });
     });

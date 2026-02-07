@@ -50,7 +50,7 @@ describe("EventDetail", () => {
       renderEventDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Authentication Required")).toBeInTheDocument();
+        expect(screen.getByText("auth required")).toBeInTheDocument();
       });
     });
   });
@@ -85,7 +85,7 @@ describe("EventDetail", () => {
       renderEventDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Event Not Found")).toBeInTheDocument();
+        expect(screen.getByText("event not found")).toBeInTheDocument();
         expect(
           screen.getByText(/does not exist or has been deleted/i),
         ).toBeInTheDocument();
@@ -99,7 +99,7 @@ describe("EventDetail", () => {
 
       await waitFor(() => {
         const backLink = screen.getByRole("link", {
-          name: /back to bins list/i,
+          name: /back to bins/i,
         });
         expect(backLink).toHaveAttribute("href", "/");
       });
@@ -134,7 +134,7 @@ describe("EventDetail", () => {
 
       await waitFor(() => {
         expect(
-          screen.getByRole("button", { name: /try again/i }),
+          screen.getByRole("button", { name: /retry/i }),
         ).toBeInTheDocument();
       });
     });
@@ -224,7 +224,7 @@ describe("EventDetail", () => {
       renderEventDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Query Parameters")).toBeInTheDocument();
+        expect(screen.getByText("query_params")).toBeInTheDocument();
         expect(screen.getByText("foo")).toBeInTheDocument();
         expect(screen.getByText("bar")).toBeInTheDocument();
         expect(screen.getByText("baz")).toBeInTheDocument();
@@ -244,10 +244,10 @@ describe("EventDetail", () => {
       renderEventDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Headers")).toBeInTheDocument();
+        expect(screen.getByText("headers")).toBeInTheDocument();
       });
 
-      expect(screen.queryByText("Query Parameters")).not.toBeInTheDocument();
+      expect(screen.queryByText("query_params")).not.toBeInTheDocument();
     });
 
     it("pretty-prints JSON body", async () => {
@@ -297,10 +297,10 @@ describe("EventDetail", () => {
       renderEventDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("Headers")).toBeInTheDocument();
+        expect(screen.getByText("headers")).toBeInTheDocument();
       });
 
-      expect(screen.queryByText("Body")).not.toBeInTheDocument();
+      expect(screen.queryByText("body")).not.toBeInTheDocument();
     });
 
     it("shows JSON label for JSON bodies", async () => {
@@ -315,7 +315,7 @@ describe("EventDetail", () => {
       renderEventDetail(apiClient);
 
       await waitFor(() => {
-        expect(screen.getByText("(JSON)")).toBeInTheDocument();
+        expect(screen.getByText("(json)")).toBeInTheDocument();
       });
     });
   });
@@ -342,7 +342,7 @@ describe("EventDetail", () => {
       await user.click(copyButton);
 
       await waitFor(() => {
-        expect(screen.getByText("Copied!")).toBeInTheDocument();
+        expect(screen.getByText("copied")).toBeInTheDocument();
       });
     });
 
@@ -366,7 +366,7 @@ describe("EventDetail", () => {
       await user.click(copyButton);
 
       await waitFor(() => {
-        expect(screen.getAllByText("Copied!").length).toBeGreaterThan(0);
+        expect(screen.getAllByText("copied").length).toBeGreaterThan(0);
       });
     });
 
@@ -390,7 +390,7 @@ describe("EventDetail", () => {
       const copyButton = screen.getByTitle("Copy headers");
       await user.click(copyButton);
 
-      expect(screen.getByText("Copied!")).toBeInTheDocument();
+      expect(screen.getByText("copied")).toBeInTheDocument();
     });
   });
 
@@ -409,7 +409,7 @@ describe("EventDetail", () => {
       renderEventDetail(apiClient);
 
       await waitFor(() => {
-        const binsLink = screen.getByRole("link", { name: "Bins" });
+        const binsLink = screen.getByRole("link", { name: "bins" });
         expect(binsLink).toHaveAttribute("href", "/");
 
         const binLink = screen.getByRole("link", {

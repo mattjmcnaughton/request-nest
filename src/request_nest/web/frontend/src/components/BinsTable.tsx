@@ -10,7 +10,7 @@ interface BinsTableProps {
 function BinCard({ bin, onClick }: { bin: Bin; onClick: () => void }) {
   return (
     <div
-      className="bg-white rounded-lg shadow p-4 mb-4 cursor-pointer hover:shadow-md transition-shadow"
+      className="bg-gray-900 border border-gray-800 rounded p-4 mb-3 cursor-pointer hover:border-gray-600 transition-colors"
       onClick={onClick}
       role="button"
       tabIndex={0}
@@ -21,19 +21,19 @@ function BinCard({ bin, onClick }: { bin: Bin; onClick: () => void }) {
       }}
     >
       <div className="flex justify-between items-start mb-2">
-        <h3 className="font-medium text-gray-900">
-          {bin.name || <span className="text-gray-400">Unnamed</span>}
+        <h3 className="font-mono text-sm text-gray-100">
+          {bin.name || <span className="text-gray-600">unnamed</span>}
         </h3>
-        <span className="text-xs text-gray-500 font-mono">{bin.id}</span>
+        <span className="font-mono text-xs text-gray-600">{bin.id}</span>
       </div>
-      <div className="text-sm text-gray-600 mb-2">
-        Created: {formatDate(bin.created_at)}
+      <div className="font-mono text-xs text-gray-500 mb-2">
+        {formatDate(bin.created_at)}
       </div>
       <div
-        className="flex items-center gap-2 bg-gray-50 rounded px-2 py-1"
+        className="flex items-center gap-2 bg-gray-950 border border-gray-800 rounded px-2 py-1"
         onClick={(e) => e.stopPropagation()}
       >
-        <code className="text-sm text-gray-700 truncate flex-1">
+        <code className="font-mono text-xs text-emerald-400 truncate flex-1">
           {bin.ingest_url}
         </code>
         <CopyButton text={bin.ingest_url} />
@@ -47,8 +47,11 @@ export function BinsTable({ bins }: BinsTableProps) {
 
   if (bins.length === 0) {
     return (
-      <div className="text-center py-12 bg-white rounded-lg shadow">
-        <p className="text-gray-500">No bins yet. Create one to get started.</p>
+      <div className="text-center py-12 bg-gray-900 border border-gray-800 rounded">
+        <p className="font-mono text-sm text-gray-500">No bins yet.</p>
+        <p className="font-mono text-xs text-gray-600 mt-2">
+          Create one to get started.
+        </p>
       </div>
     );
   }
@@ -60,59 +63,59 @@ export function BinsTable({ bins }: BinsTableProps) {
   return (
     <>
       {/* Mobile: Card layout */}
-      <div className="md:hidden space-y-4">
+      <div className="md:hidden space-y-3">
         {bins.map((bin) => (
           <BinCard key={bin.id} bin={bin} onClick={() => handleBinClick(bin.id)} />
         ))}
       </div>
 
       {/* Desktop: Table layout */}
-      <div className="hidden md:block bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="hidden md:block bg-gray-900 border border-gray-800 rounded overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-800">
+          <thead className="bg-gray-900">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left font-mono text-xs text-gray-500 uppercase tracking-wider">
                 Name
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left font-mono text-xs text-gray-500 uppercase tracking-wider">
                 ID
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left font-mono text-xs text-gray-500 uppercase tracking-wider">
                 Created
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-4 py-3 text-left font-mono text-xs text-gray-500 uppercase tracking-wider">
                 Ingest URL
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="divide-y divide-gray-800">
             {bins.map((bin) => (
               <tr
                 key={bin.id}
-                className="hover:bg-gray-50 cursor-pointer"
+                className="hover:bg-gray-800/50 cursor-pointer"
                 onClick={() => handleBinClick(bin.id)}
               >
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="text-sm text-gray-900">
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <span className="font-mono text-sm text-gray-100">
                     {bin.name || (
-                      <span className="text-gray-400 italic">Unnamed</span>
+                      <span className="text-gray-600 italic">unnamed</span>
                     )}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <code className="text-sm text-gray-600 font-mono">
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <code className="font-mono text-xs text-gray-400">
                     {bin.id}
                   </code>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                <td className="px-4 py-3 whitespace-nowrap font-mono text-xs text-gray-500">
                   {formatDate(bin.created_at)}
                 </td>
                 <td
-                  className="px-6 py-4 whitespace-nowrap"
+                  className="px-4 py-3 whitespace-nowrap"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="flex items-center gap-2">
-                    <code className="text-sm text-gray-600 font-mono truncate max-w-xs">
+                    <code className="font-mono text-xs text-emerald-400 truncate max-w-xs">
                       {bin.ingest_url}
                     </code>
                     <CopyButton text={bin.ingest_url} />

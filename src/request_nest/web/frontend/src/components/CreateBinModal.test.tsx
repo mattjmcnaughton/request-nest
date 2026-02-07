@@ -22,7 +22,7 @@ describe("CreateBinModal", () => {
       { apiClient },
     );
 
-    expect(screen.queryByText("Create New Bin")).not.toBeInTheDocument();
+    expect(screen.queryByText("new bin")).not.toBeInTheDocument();
   });
 
   it("renders modal when isOpen is true", () => {
@@ -31,10 +31,10 @@ describe("CreateBinModal", () => {
       { apiClient },
     );
 
-    expect(screen.getByText("Create New Bin")).toBeInTheDocument();
+    expect(screen.getByText("new bin")).toBeInTheDocument();
     expect(screen.getByLabelText(/name/i)).toBeInTheDocument();
     expect(
-      screen.getByRole("button", { name: /create bin/i }),
+      screen.getByRole("button", { name: /^create$/i }),
     ).toBeInTheDocument();
   });
 
@@ -46,7 +46,7 @@ describe("CreateBinModal", () => {
     );
 
     await user.type(screen.getByLabelText(/name/i), "My Webhook");
-    await user.click(screen.getByRole("button", { name: /create bin/i }));
+    await user.click(screen.getByRole("button", { name: /^create$/i }));
 
     await waitFor(() => {
       expect(onCreated).toHaveBeenCalledTimes(1);
@@ -64,7 +64,7 @@ describe("CreateBinModal", () => {
       { apiClient },
     );
 
-    await user.click(screen.getByRole("button", { name: /create bin/i }));
+    await user.click(screen.getByRole("button", { name: /^create$/i }));
 
     await waitFor(() => {
       expect(onCreated).toHaveBeenCalledTimes(1);
@@ -82,7 +82,7 @@ describe("CreateBinModal", () => {
       { apiClient },
     );
 
-    await user.click(screen.getByRole("button", { name: /create bin/i }));
+    await user.click(screen.getByRole("button", { name: /^create$/i }));
 
     await waitFor(() => {
       expect(onClose).toHaveBeenCalledTimes(1);
@@ -125,7 +125,7 @@ describe("CreateBinModal", () => {
       { apiClient: slowClient },
     );
 
-    await user.click(screen.getByRole("button", { name: /create bin/i }));
+    await user.click(screen.getByRole("button", { name: /^create$/i }));
 
     expect(screen.getByText(/creating/i)).toBeInTheDocument();
   });

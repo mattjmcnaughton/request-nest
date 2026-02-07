@@ -24,40 +24,43 @@ export function AuthPrompt({ onAuthenticated }: AuthPromptProps) {
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">
-          Authentication Required
-        </h2>
-        <p className="text-gray-600 mb-4">
-          Enter your admin token to access request-nest.
+    <div className="fixed inset-0 bg-black/80 flex items-center justify-center p-4">
+      <div className="bg-gray-900 border border-gray-700 rounded max-w-md w-full p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <span className="inline-block h-2 w-2 rounded-full bg-amber-400"></span>
+          <h2 className="font-mono text-sm font-semibold text-gray-100">
+            auth required
+          </h2>
+        </div>
+        <p className="font-mono text-xs text-gray-400 mb-4">
+          Enter admin token to access request-nest.
         </p>
 
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label
               htmlFor="token"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block font-mono text-xs text-gray-500 mb-1"
             >
-              Admin Token
+              token
             </label>
             <input
               type="password"
               id="token"
               value={tokenInput}
               onChange={(e) => setTokenInput(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter your token"
+              className="w-full px-3 py-2 bg-gray-950 border border-gray-700 rounded font-mono text-sm text-gray-100 placeholder-gray-600 focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500"
+              placeholder="enter token..."
               autoFocus
             />
-            {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+            {error && <p className="mt-1 font-mono text-xs text-red-400">{error}</p>}
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+            className="w-full bg-emerald-600 text-gray-950 py-2 px-4 rounded font-mono text-sm font-semibold hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 focus:ring-offset-gray-900 transition-colors"
           >
-            Authenticate
+            authenticate
           </button>
         </form>
       </div>
