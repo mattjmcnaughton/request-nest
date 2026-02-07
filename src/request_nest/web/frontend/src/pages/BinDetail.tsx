@@ -1,61 +1,10 @@
-import { useState, useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router";
 import { useApi } from "../contexts";
-import { hasToken, clearToken } from "../utils";
+import { hasToken, clearToken, formatDate, formatSize } from "../utils";
 import { ApiError } from "../types";
 import type { Bin, EventSummary } from "../types";
-import { AuthPrompt } from "../components";
-
-function formatDate(isoString: string): string {
-  const date = new Date(isoString);
-  return date.toLocaleString();
-}
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function CopyButton({ text }: { text: string }) {
-  const [copied, setCopied] = useState(false);
-
-  const handleCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
-      console.error("Failed to copy:", err);
-    }
-  };
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="inline-flex items-center px-2 py-1 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded transition-colors"
-      title="Copy to clipboard"
-    >
-      {copied ? (
-        <span className="text-green-600">Copied!</span>
-      ) : (
-        <svg
-          className="w-4 h-4"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-          />
-        </svg>
-      )}
-    </button>
-  );
-}
+import { AuthPrompt, CopyButton } from "../components";
 
 interface EventCardProps {
   event: EventSummary;

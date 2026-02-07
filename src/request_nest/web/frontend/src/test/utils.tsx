@@ -73,3 +73,26 @@ export function createTestEvent(
     ...overrides,
   };
 }
+
+/**
+ * Create a full test event detail with default values.
+ */
+export function createTestEventDetail(
+  overrides: Partial<import("../types").Event> = {},
+): import("../types").Event {
+  const id =
+    overrides.id ?? `e_test${Math.random().toString(36).slice(2, 10)}`;
+  return {
+    id,
+    bin_id: overrides.bin_id ?? "b_test123",
+    method: overrides.method ?? "POST",
+    path: overrides.path ?? "/webhook",
+    query_params: overrides.query_params ?? {},
+    headers: overrides.headers ?? { "content-type": "application/json" },
+    body: overrides.body ?? '{"key": "value"}',
+    remote_ip: overrides.remote_ip ?? "127.0.0.1",
+    size_bytes: overrides.size_bytes ?? 128,
+    created_at: overrides.created_at ?? "2025-01-15T10:30:00.000Z",
+    ...overrides,
+  };
+}

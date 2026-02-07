@@ -2,6 +2,7 @@ import type { BinApiClient } from "./client";
 import type {
   Bin,
   BinListResponse,
+  Event,
   EventSummary,
   EventListResponse,
   ApiErrorResponse,
@@ -45,6 +46,11 @@ export class RealBinApiClient implements BinApiClient {
     const response = await this.fetch(`/bins/${binId}/events`);
     const data: EventListResponse = await response.json();
     return data.events;
+  }
+
+  async getEvent(eventId: string): Promise<Event> {
+    const response = await this.fetch(`/events/${eventId}`);
+    return response.json();
   }
 
   private async fetch(

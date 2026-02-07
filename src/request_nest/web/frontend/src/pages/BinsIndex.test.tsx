@@ -58,6 +58,7 @@ describe("BinsIndex", () => {
         getBin: vi.fn(),
         createBin: vi.fn(),
         listEventsForBin: vi.fn(),
+        getEvent: vi.fn(),
       };
 
       renderWithProviders(<BinsIndex />, { apiClient: slowClient });

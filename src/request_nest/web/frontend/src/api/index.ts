@@ -4,4 +4,5 @@ export {
   FakeBinApiClient,
   createFakeClientWithBins,
   createFakeClientWithBinAndEvents,
+  createFakeClientWithEventDetail,
 } from "./fakeClient";

@@ -19,18 +19,18 @@ class TestUserViewsBinsList:
 
     def test_displays_empty_state_when_no_bins_exist(
         self,
-        authenticated_page: Page,
+        clean_authenticated_page: Page,
     ) -> None:
         """User sees empty state message when no bins have been created."""
         # The page should show the empty state
-        expect(authenticated_page.get_by_text("No bins yet")).to_be_visible()
+        expect(clean_authenticated_page.get_by_text("No bins yet")).to_be_visible()
 
     def test_displays_bins_after_creation(
         self,
-        authenticated_page: Page,
+        clean_authenticated_page: Page,
     ) -> None:
         """User sees bins in the list after creating them."""
-        page = authenticated_page
+        page = clean_authenticated_page
 
         # Create a bin first
         page.get_by_role("button", name="Create Bin").first.click()
@@ -86,13 +86,13 @@ class TestUserCreatesNewBin:
 
     def test_can_cancel_bin_creation(
         self,
-        authenticated_page: Page,
+        clean_authenticated_page: Page,
     ) -> None:
         """User can cancel bin creation without creating a bin."""
-        page = authenticated_page
+        page = clean_authenticated_page
 
-        # Count existing bins before attempting creation
-        bin_rows_before = page.get_by_role("row").count()
+        # Wait for page to fully load (empty state with clean database)
+        expect(page.get_by_text("No bins yet")).to_be_visible()
 
         # Open create modal
         page.get_by_role("button", name="Create Bin").first.click()
@@ -106,9 +106,8 @@ class TestUserCreatesNewBin:
         # Modal should be closed
         expect(page.get_by_text("Create New Bin")).not_to_be_visible()
 
-        # Bin count should remain the same (no new bin created)
-        bin_rows_after = page.get_by_role("row").count()
-        assert bin_rows_after == bin_rows_before
+        # Empty state should still be shown (no new bin created)
+        expect(page.get_by_text("No bins yet")).to_be_visible()
 
 
 @pytest.mark.ui
