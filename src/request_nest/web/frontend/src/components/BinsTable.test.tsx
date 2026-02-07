@@ -34,11 +34,11 @@ describe("BinsTable", () => {
       expect(names.length).toBeGreaterThan(0);
     });
 
-    it("displays 'Unnamed' for bins without name", () => {
+    it("displays 'unnamed' for bins without name", () => {
       const bin = createTestBin({ name: null });
       renderWithProviders(<BinsTable bins={[bin]} />);
 
-      expect(screen.getAllByText("Unnamed").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("unnamed").length).toBeGreaterThan(0);
     });
 
     it("displays bin ID", () => {
@@ -90,7 +90,7 @@ describe("BinsTable", () => {
       const copyButtons = screen.getAllByTitle("Copy to clipboard");
       await user.click(copyButtons[0]);
 
-      expect(screen.getAllByText("Copied!").length).toBeGreaterThan(0);
+      expect(screen.getAllByText("copied").length).toBeGreaterThan(0);
     });
   });
 });

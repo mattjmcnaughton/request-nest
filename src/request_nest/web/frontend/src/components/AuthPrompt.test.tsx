@@ -1,15 +1,16 @@
 import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { AuthPrompt } from "./AuthPrompt";
 import { getToken } from "../utils";
+import { renderWithProviders } from "../test/utils";
 
 describe("AuthPrompt", () => {
   it("renders auth prompt dialog", () => {
-    render(<AuthPrompt onAuthenticated={vi.fn()} />);
+    renderWithProviders(<AuthPrompt onAuthenticated={vi.fn()} />);
 
-    expect(screen.getByText("Authentication Required")).toBeInTheDocument();
-    expect(screen.getByLabelText(/admin token/i)).toBeInTheDocument();
+    expect(screen.getByText("auth required")).toBeInTheDocument();
+    expect(screen.getByLabelText(/token/i)).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: /authenticate/i }),
     ).toBeInTheDocument();
@@ -18,9 +19,9 @@ describe("AuthPrompt", () => {
   it("stores token when form is submitted", async () => {
     const user = userEvent.setup();
     const onAuthenticated = vi.fn();
-    render(<AuthPrompt onAuthenticated={onAuthenticated} />);
+    renderWithProviders(<AuthPrompt onAuthenticated={onAuthenticated} />);
 
-    await user.type(screen.getByLabelText(/admin token/i), "test-token-123");
+    await user.type(screen.getByLabelText(/token/i), "test-token-123");
     await user.click(screen.getByRole("button", { name: /authenticate/i }));
 
     expect(getToken()).toBe("test-token-123");
@@ -29,9 +30,9 @@ describe("AuthPrompt", () => {
   it("calls onAuthenticated after token is stored", async () => {
     const user = userEvent.setup();
     const onAuthenticated = vi.fn();
-    render(<AuthPrompt onAuthenticated={onAuthenticated} />);
+    renderWithProviders(<AuthPrompt onAuthenticated={onAuthenticated} />);
 
-    await user.type(screen.getByLabelText(/admin token/i), "my-token");
+    await user.type(screen.getByLabelText(/token/i), "my-token");
     await user.click(screen.getByRole("button", { name: /authenticate/i }));
 
     expect(onAuthenticated).toHaveBeenCalledTimes(1);
@@ -40,7 +41,7 @@ describe("AuthPrompt", () => {
   it("shows error when submitting empty token", async () => {
     const user = userEvent.setup();
     const onAuthenticated = vi.fn();
-    render(<AuthPrompt onAuthenticated={onAuthenticated} />);
+    renderWithProviders(<AuthPrompt onAuthenticated={onAuthenticated} />);
 
     await user.click(screen.getByRole("button", { name: /authenticate/i }));
 
@@ -53,9 +54,9 @@ describe("AuthPrompt", () => {
   it("trims whitespace from token", async () => {
     const user = userEvent.setup();
     const onAuthenticated = vi.fn();
-    render(<AuthPrompt onAuthenticated={onAuthenticated} />);
+    renderWithProviders(<AuthPrompt onAuthenticated={onAuthenticated} />);
 
-    await user.type(screen.getByLabelText(/admin token/i), "  spaced-token  ");
+    await user.type(screen.getByLabelText(/token/i), "  spaced-token  ");
     await user.click(screen.getByRole("button", { name: /authenticate/i }));
 
     expect(getToken()).toBe("spaced-token");

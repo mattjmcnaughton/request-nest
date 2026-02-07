@@ -26,9 +26,9 @@ class TestUserViewsBinDetail:
         page = authenticated_page
 
         # Create a bin first
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Detail Test Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Detail Test Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Wait for bin to appear in the table
         expect(page.get_by_role("cell", name="Detail Test Bin")).to_be_visible()
@@ -39,7 +39,7 @@ class TestUserViewsBinDetail:
         # Verify we're on the bin detail page
         expect(page.get_by_role("heading", name="Detail Test Bin")).to_be_visible()
         # Verify ingest URL section is shown
-        expect(page.get_by_text("Send a request to the ingest URL")).to_be_visible()
+        expect(page.get_by_text("Send HTTP requests to this URL")).to_be_visible()
 
     def test_displays_bin_information(
         self,
@@ -49,9 +49,9 @@ class TestUserViewsBinDetail:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Info Test Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Info Test Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Wait for bin to appear and navigate
         expect(page.get_by_role("cell", name="Info Test Bin")).to_be_visible()
@@ -72,9 +72,9 @@ class TestUserViewsBinDetail:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Empty Events Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Empty Events Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Navigate to detail
         expect(page.get_by_role("cell", name="Empty Events Bin")).to_be_visible()
@@ -91,9 +91,9 @@ class TestUserViewsBinDetail:
         page = authenticated_page
 
         # Create a bin
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Events Test Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Events Test Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Wait for bin and get its ingest URL
         expect(page.get_by_role("cell", name="Events Test Bin")).to_be_visible()
@@ -105,7 +105,7 @@ class TestUserViewsBinDetail:
         expect(page.get_by_role("heading", name="Events Test Bin")).to_be_visible()
 
         # Get the ingest URL from the header section (it's the code element in the rounded bg-gray-50 div)
-        ingest_url_element = page.locator(".rounded-md.bg-gray-50 code")
+        ingest_url_element = page.locator("code").filter(has_text=re.compile(r"^http")).first
         ingest_url = ingest_url_element.inner_text()
 
         # Send a webhook request to the ingest URL (it already includes the full URL)
@@ -133,9 +133,9 @@ class TestUserViewsBinDetail:
         page = authenticated_page
 
         # Create a bin and navigate to detail
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Back Link Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Back Link Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         expect(page.get_by_role("cell", name="Back Link Bin")).to_be_visible()
         page.get_by_role("row", name=re.compile("Back Link Bin")).click()
@@ -144,10 +144,10 @@ class TestUserViewsBinDetail:
         expect(page.get_by_role("heading", name="Back Link Bin")).to_be_visible()
 
         # Click back link
-        page.get_by_role("link", name="Back to bins").click()
+        page.get_by_role("link", name="cd ..").click()
 
         # Verify we're back on the bins list
-        expect(page.get_by_role("heading", name="request-nest")).to_be_visible()
+        expect(page.get_by_role("heading", name="$ bins")).to_be_visible()
 
 
 @pytest.mark.ui
@@ -163,9 +163,9 @@ class TestUserCopiesIngestUrlFromDetail:
         page = authenticated_page
 
         # Create a bin and navigate to detail
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Copy URL Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Copy URL Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         expect(page.get_by_role("cell", name="Copy URL Bin")).to_be_visible()
         page.get_by_role("row", name=re.compile("Copy URL Bin")).click()
@@ -176,9 +176,8 @@ class TestUserCopiesIngestUrlFromDetail:
         # Grant clipboard permissions
         page.context.grant_permissions(["clipboard-read", "clipboard-write"])
 
-        # Click copy button in the header section (within the bg-gray-50 div)
-        header_section = page.locator(".bg-white.rounded-lg.shadow.p-6")
-        copy_button = header_section.get_by_title("Copy to clipboard")
+        # Click copy button for the ingest URL
+        copy_button = page.get_by_title("Copy to clipboard")
         copy_button.click()
 
         # Verify clipboard contains an ingest URL (full URL with hostname)
@@ -195,9 +194,9 @@ class TestUserCopiesIngestUrlFromDetail:
         page = authenticated_page
 
         # Create a bin and navigate to detail
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Feedback Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Feedback Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         expect(page.get_by_role("cell", name="Feedback Bin")).to_be_visible()
         page.get_by_role("row", name=re.compile("Feedback Bin")).click()
@@ -208,10 +207,9 @@ class TestUserCopiesIngestUrlFromDetail:
         # Grant clipboard permissions
         page.context.grant_permissions(["clipboard-read", "clipboard-write"])
 
-        # Click copy button in the header section
-        header_section = page.locator(".bg-white.rounded-lg.shadow.p-6")
-        copy_button = header_section.get_by_title("Copy to clipboard")
+        # Click copy button for the ingest URL
+        copy_button = page.get_by_title("Copy to clipboard")
         copy_button.click()
 
         # Verify feedback
-        expect(page.get_by_text("Copied!")).to_be_visible()
+        expect(page.get_by_text("copied")).to_be_visible()

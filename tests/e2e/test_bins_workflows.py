@@ -33,9 +33,9 @@ class TestUserViewsBinsList:
         page = clean_authenticated_page
 
         # Create a bin first
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Test Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Test Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Wait for modal to close and bin to appear in the table
         expect(page.get_by_role("cell", name="Test Bin")).to_be_visible()
@@ -57,13 +57,13 @@ class TestUserCreatesNewBin:
         page = authenticated_page
 
         # Open create modal
-        page.get_by_role("button", name="Create Bin").first.click()
+        page.get_by_role("button", name="new bin").first.click()
 
         # Fill in the name
-        page.get_by_label("Name (optional)").fill("My Webhook Bin")
+        page.get_by_label("name (optional)").fill("My Webhook Bin")
 
         # Submit (use the form's submit button)
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Verify the bin appears in the table
         expect(page.get_by_role("cell", name="My Webhook Bin")).to_be_visible()
@@ -76,10 +76,10 @@ class TestUserCreatesNewBin:
         page = authenticated_page
 
         # Open create modal
-        page.get_by_role("button", name="Create Bin").first.click()
+        page.get_by_role("button", name="new bin").first.click()
 
         # Submit without filling name
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Verify a bin was created (should show bin ID in table cell)
         expect(page.get_by_role("cell").filter(has_text=re.compile(r"^b_")).first).to_be_visible()
@@ -95,16 +95,16 @@ class TestUserCreatesNewBin:
         expect(page.get_by_text("No bins yet")).to_be_visible()
 
         # Open create modal
-        page.get_by_role("button", name="Create Bin").first.click()
+        page.get_by_role("button", name="new bin").first.click()
 
         # Verify modal is open
-        expect(page.get_by_text("Create New Bin")).to_be_visible()
+        expect(page.get_by_role("heading", name="new bin").last).to_be_visible()
 
         # Cancel
-        page.get_by_role("button", name="Cancel").click()
+        page.get_by_role("button", name="cancel").click()
 
         # Modal should be closed
-        expect(page.get_by_text("Create New Bin")).not_to_be_visible()
+        expect(page.get_by_role("heading", name="new bin").last).not_to_be_visible()
 
         # Empty state should still be shown (no new bin created)
         expect(page.get_by_text("No bins yet")).to_be_visible()
@@ -123,9 +123,9 @@ class TestUserCopiesIngestUrl:
         page = authenticated_page
 
         # First create a bin with a unique name
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Copy Test Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Copy Test Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Wait for bin to appear in the table
         expect(page.get_by_role("cell", name="Copy Test Bin")).to_be_visible()
@@ -152,9 +152,9 @@ class TestUserCopiesIngestUrl:
         page = authenticated_page
 
         # First create a bin with a unique name
-        page.get_by_role("button", name="Create Bin").first.click()
-        page.get_by_label("Name (optional)").fill("Feedback Test Bin")
-        page.locator("form").get_by_role("button", name="Create Bin").click()
+        page.get_by_role("button", name="new bin").first.click()
+        page.get_by_label("name (optional)").fill("Feedback Test Bin")
+        page.locator("form").get_by_role("button", name="create").click()
 
         # Wait for bin to appear in the table
         expect(page.get_by_role("cell", name="Feedback Test Bin")).to_be_visible()
@@ -166,8 +166,8 @@ class TestUserCopiesIngestUrl:
         bin_row = page.get_by_role("row", name=re.compile("Feedback Test Bin"))
         bin_row.get_by_title("Copy to clipboard").click()
 
-        # Should show "Copied!" feedback
-        expect(page.get_by_text("Copied!")).to_be_visible()
+        # Should show "copied" feedback
+        expect(page.get_by_text("copied")).to_be_visible()
 
 
 @pytest.mark.ui
@@ -185,8 +185,8 @@ class TestAdminTokenAuthentication:
         page.goto(live_server)
 
         # Should see auth prompt
-        expect(page.get_by_text("Authentication Required")).to_be_visible()
-        expect(page.get_by_label("Admin Token")).to_be_visible()
+        expect(page.get_by_text("auth required")).to_be_visible()
+        expect(page.get_by_label("token")).to_be_visible()
 
     def test_can_authenticate_with_valid_token(
         self,
@@ -200,8 +200,8 @@ class TestAdminTokenAuthentication:
         page.goto(live_server)
 
         # Enter valid token
-        page.get_by_label("Admin Token").fill(settings.admin_token)
-        page.get_by_role("button", name="Authenticate").click()
+        page.get_by_label("token").fill(settings.admin_token)
+        page.get_by_role("button", name="authenticate").click()
 
         # Should now see the main page header
-        expect(page.get_by_role("heading", name="request-nest")).to_be_visible()
+        expect(page.get_by_role("heading", name="$ bins")).to_be_visible()
