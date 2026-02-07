@@ -109,6 +109,7 @@ describe("CreateBinModal", () => {
       listBins: apiClient.listBins.bind(apiClient),
       getBin: apiClient.getBin.bind(apiClient),
       listEventsForBin: apiClient.listEventsForBin.bind(apiClient),
+      getEvent: apiClient.getEvent.bind(apiClient),
       createBin: vi
         .fn()
         .mockImplementation(

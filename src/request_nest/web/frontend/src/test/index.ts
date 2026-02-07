@@ -1,1 +1,6 @@
-export { renderWithProviders, createTestBin, createTestEvent } from "./utils";
+export {
+  renderWithProviders,
+  createTestBin,
+  createTestEvent,
+  createTestEventDetail,
+} from "./utils";

@@ -1,5 +1,5 @@
 import type { BinApiClient } from "./client";
-import type { Bin, EventSummary } from "../types";
+import type { Bin, Event, EventSummary } from "../types";
 import { ApiError } from "../types";
 
 /**
@@ -24,6 +24,7 @@ function generateBinId(): string {
 export class FakeBinApiClient implements BinApiClient {
   private bins: Map<string, Bin> = new Map();
   private events: Map<string, EventSummary[]> = new Map();
+  private eventDetails: Map<string, Event> = new Map();
 
   /**
    * Clear all stored bins and events. Call this between tests.
@@ -31,6 +32,7 @@ export class FakeBinApiClient implements BinApiClient {
   clear(): void {
     this.bins.clear();
     this.events.clear();
+    this.eventDetails.clear();
   }
 
   /**
@@ -56,6 +58,13 @@ export class FakeBinApiClient implements BinApiClient {
     for (const event of events) {
       this.addEvent(binId, event);
     }
+  }
+
+  /**
+   * Add a full event detail (for test setup).
+   */
+  addEventDetail(event: Event): void {
+    this.eventDetails.set(event.id, event);
   }
 
   /**
@@ -98,6 +107,14 @@ export class FakeBinApiClient implements BinApiClient {
   async listEventsForBin(binId: string): Promise<EventSummary[]> {
     return this.events.get(binId) ?? [];
   }
+
+  async getEvent(eventId: string): Promise<Event> {
+    const event = this.eventDetails.get(eventId);
+    if (!event) {
+      throw new ApiError("NOT_FOUND", `Event ${eventId} not found`, 404);
+    }
+    return event;
+  }
 }
 
 /**
@@ -121,5 +138,18 @@ export function createFakeClientWithBinAndEvents(
   const client = new FakeBinApiClient();
   client.addBin(bin);
   client.addEvents(bin.id, events);
+  return client;
+}
+
+/**
+ * Create a FakeApiClient pre-populated with an event detail and its parent bin.
+ */
+export function createFakeClientWithEventDetail(
+  bin: Bin,
+  event: Event,
+): FakeBinApiClient {
+  const client = new FakeBinApiClient();
+  client.addBin(bin);
+  client.addEventDetail(event);
   return client;
 }

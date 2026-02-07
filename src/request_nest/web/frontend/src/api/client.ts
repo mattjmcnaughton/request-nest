@@ -1,4 +1,4 @@
-import type { Bin, EventSummary } from "../types";
+import type { Bin, EventSummary, Event } from "../types";
 
 /**
  * API client interface for bin operations.
@@ -31,4 +31,10 @@ export interface BinApiClient {
    * @throws {ApiError} If the request fails
    */
   listEventsForBin(binId: string): Promise<EventSummary[]>;
+
+  /**
+   * Fetch a single event by ID.
+   * @throws {ApiError} If the request fails or event not found (404)
+   */
+  getEvent(eventId: string): Promise<Event>;
 }

@@ -6,11 +6,12 @@ import subprocess
 import time
 from collections.abc import Generator
 
+import psycopg
 import pytest
 from playwright.sync_api import Page
 
 from request_nest.config import settings
-from tests.conftest import get_test_database_url
+from tests.conftest import get_sync_test_db_url, get_test_database_url
 
 
 def _get_free_port() -> int:
@@ -83,6 +84,14 @@ def live_server(setup_test_database: None) -> Generator[str]:
     process.wait(timeout=5)
 
 
+def _setup_authenticated_page(page: Page, live_server: str) -> Page:
+    """Set up authentication on a Playwright page."""
+    page.goto(live_server)
+    page.evaluate(f"() => localStorage.setItem('request_nest_admin_token', '{settings.admin_token}')")
+    page.reload()
+    return page
+
+
 @pytest.fixture
 def authenticated_page(page: Page, live_server: str) -> Page:
     """A Playwright page with admin token pre-set in localStorage.
@@ -90,13 +99,20 @@ def authenticated_page(page: Page, live_server: str) -> Page:
     This fixture navigates to the live server and sets the admin token
     in localStorage before returning the page for testing.
     """
-    # Navigate to the app to establish the origin for localStorage
-    page.goto(live_server)
+    return _setup_authenticated_page(page, live_server)
 
-    # Set the admin token in localStorage
-    page.evaluate(f"() => localStorage.setItem('request_nest_admin_token', '{settings.admin_token}')")
 
-    # Reload to apply the token
-    page.reload()
+@pytest.fixture
+def clean_authenticated_page(page: Page, live_server: str) -> Page:
+    """An authenticated page with a clean database.
 
-    return page
+    Truncates all bins and events before navigating, ensuring the page
+    loads with an empty state. Use for tests that depend on specific
+    database contents.
+    """
+    db_url = get_sync_test_db_url()
+    with psycopg.connect(db_url) as conn:
+        with conn.cursor() as cur:
+            cur.execute("TRUNCATE events, bins CASCADE")
+        conn.commit()
+    return _setup_authenticated_page(page, live_server)
