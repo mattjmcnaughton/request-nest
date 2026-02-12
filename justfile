@@ -102,6 +102,14 @@ db-upgrade:
 db-downgrade:
     uv run alembic downgrade -1
 
+# Start observability stack (Tempo + Prometheus + Loki + Promtail + Grafana)
+obs-up:
+    docker compose up -d tempo prometheus loki promtail grafana
+
+# Stop observability stack
+obs-down:
+    docker compose down tempo prometheus loki promtail grafana
+
 # Build Docker image
 docker-build:
     docker build -t request-nest .

@@ -33,6 +33,6 @@ COPY --from=base /app/src /app/src
 ENV PATH="/app/.venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 
-EXPOSE 8000
+EXPOSE 8000 9464
 
 CMD ["uvicorn", "request_nest.main:app", "--host", "0.0.0.0", "--port", "8000"]

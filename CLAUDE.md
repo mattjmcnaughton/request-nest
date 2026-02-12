@@ -35,7 +35,7 @@ REST API using FastAPI with layered architecture:
 - `services/` - Business logic and workflows
 - `domain/` - Core business entities and models
 - `repositories/` - Data persistence layer (PostgreSQL via asyncpg)
-- `observability/` - Logging with structlog
+- `observability/` - Logging (structlog), tracing (OpenTelemetry), and metrics (Prometheus)
 - `web/frontend/` - React SPA (Vite + TypeScript + Tailwind)
 - `config.py` - Application settings (via pydantic-settings)
 
@@ -76,7 +76,7 @@ Captured HTTP requests. Each event stores:
 - Python 3.13+
 - Async for all I/O operations
 - Pydantic for all data structures
-- structlog for logging (snake_case events)
+- structlog for logging (snake_case events); OpenTelemetry for tracing
 - 120 char line length
 - Absolute imports only
 - All environment variables MUST use `REQUEST_NEST_` prefix (e.g., `REQUEST_NEST_HOST`, `REQUEST_NEST_PORT`)
@@ -110,6 +110,7 @@ Application settings in `config.py` using pydantic-settings:
 - See `.env.example` for available settings
 - **IMPORTANT**: All new environment variables must use the `REQUEST_NEST_` prefix
 - Settings class is configured with `env_prefix="REQUEST_NEST_"` to enforce this convention
+- Exception: Standard OpenTelemetry env vars (`OTEL_SDK_DISABLED`, `OTEL_EXPORTER_OTLP_ENDPOINT`) use the OTel convention, not the app prefix
 
 ## Database Migrations
 
@@ -156,6 +157,18 @@ Full stack with docker-compose:
 - `just down` - Stop all services
 - `just db-logs` - View database logs
 - `just db-shell` - Connect to database
+- `just obs-up` - Start observability stack (Tempo, Prometheus, Loki, Promtail, Grafana)
+- `just obs-down` - Stop observability stack
+
+### Observability Ports
+
+| Service    | Port |
+|------------|------|
+| Grafana    | 3300 |
+| Prometheus | 9090 |
+| Loki       | 3100 |
+| Tempo      | 3200 |
+| Metrics    | 9464 |
 
 ## Before Committing
 

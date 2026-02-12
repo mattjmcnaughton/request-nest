@@ -1,5 +1,7 @@
 """Controller for Bin API endpoints."""
 
+import structlog
+from opentelemetry import metrics
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from request_nest.dtos.v1 import BinListResponse, BinResponse, CreateBinRequest
@@ -7,6 +9,14 @@ from request_nest.errors import not_found_error
 from request_nest.services import BinService
 
 __all__ = ["BinController"]
+
+logger = structlog.get_logger()
+
+meter = metrics.get_meter(__name__)
+bins_listed_counter = meter.create_counter(
+    "request_nest.bins.listed",
+    description="Number of bins list views",
+)
 
 
 class BinController:
@@ -39,7 +49,9 @@ class BinController:
         Returns:
             The created bin as a BinResponse DTO.
         """
-        return await self._service.create_bin(session, name=request.name, base_url=base_url)
+        result = await self._service.create_bin(session, name=request.name, base_url=base_url)
+        logger.info("bin_created", bin_id=result.id, bin_name=result.name)
+        return result
 
     async def get_bin(
         self,
@@ -63,6 +75,7 @@ class BinController:
         result = await self._service.get_bin(session, bin_id=bin_id, base_url=base_url)
         if result is None:
             raise not_found_error("Bin", bin_id)
+        logger.info("bin_retrieved", bin_id=bin_id)
         return result
 
     async def list_bins(
@@ -80,4 +93,6 @@ class BinController:
             A BinListResponse containing all bins.
         """
         bins = await self._service.list_bins(session, base_url=base_url)
+        logger.info("bins_listed", count=len(bins))
+        bins_listed_counter.add(1)
         return BinListResponse(bins=bins)

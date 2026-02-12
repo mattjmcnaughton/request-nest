@@ -55,6 +55,7 @@ def live_server(setup_test_database: None) -> Generator[str]:
     env["REQUEST_NEST_DATABASE_URL"] = test_db_url
     env["REQUEST_NEST_BASE_URL"] = base_url
     env["REQUEST_NEST_LOG_LEVEL"] = "WARNING"
+    env["OTEL_SDK_DISABLED"] = "true"
 
     process = subprocess.Popen(
         [
