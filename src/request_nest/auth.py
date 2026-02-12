@@ -2,12 +2,22 @@
 
 from typing import Annotated
 
+import structlog
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from opentelemetry import metrics
 
 from request_nest.config import settings
 
 __all__ = ["AdminAuth", "verify_admin_token"]
+
+logger = structlog.get_logger()
+
+meter = metrics.get_meter(__name__)
+auth_failures_counter = meter.create_counter(
+    "request_nest.auth.failures",
+    description="Number of failed authentication attempts",
+)
 
 _security = HTTPBearer(auto_error=False)
 _security_dependency = Depends(_security)
@@ -28,12 +38,16 @@ async def verify_admin_token(
         HTTPException: 401 if token is missing or invalid.
     """
     if credentials is None:
+        logger.warning("auth_failure", reason="missing_token")
+        auth_failures_counter.add(1, {"reason": "missing_token"})
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"error": {"code": "UNAUTHORIZED", "message": "Missing authentication token"}},
         )
 
     if credentials.credentials != settings.admin_token:
+        logger.warning("auth_failure", reason="invalid_token")
+        auth_failures_counter.add(1, {"reason": "invalid_token"})
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={"error": {"code": "UNAUTHORIZED", "message": "Invalid authentication token"}},

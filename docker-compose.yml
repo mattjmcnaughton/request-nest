@@ -3,13 +3,17 @@ services:
     build: .
     ports:
       - "8000:8000"
+      - "9464:9464"
     environment:
       - REQUEST_NEST_DATABASE_URL=postgresql://request_nest:request_nest@db:5432/request_nest
       - REQUEST_NEST_MIGRATION_DATABASE_URL=postgresql+psycopg://request_nest:request_nest@db:5432/request_nest
       - REQUEST_NEST_ADMIN_TOKEN=${REQUEST_NEST_ADMIN_TOKEN:-dev-token-change-me}
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4317
     depends_on:
       db:
         condition: service_healthy
+      tempo:
+        condition: service_started
     restart: unless-stopped
 
   db:
@@ -29,5 +33,66 @@ services:
       retries: 5
     restart: unless-stopped
 
+  tempo:
+    image: grafana/tempo:2.6.1
+    volumes:
+      - ./docker/tempo/tempo.yaml:/etc/tempo/tempo.yaml:ro
+      - tempo_data:/var/tempo
+    command: ["-config.file=/etc/tempo/tempo.yaml"]
+    ports:
+      - "3200:3200"
+      - "4317:4317"
+    restart: unless-stopped
+
+  prometheus:
+    image: prom/prometheus:v2.54.1
+    volumes:
+      - ./docker/prometheus/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+    restart: unless-stopped
+
+  loki:
+    image: grafana/loki:3.3.2
+    volumes:
+      - ./docker/loki/loki.yaml:/etc/loki/loki.yaml:ro
+      - loki_data:/loki
+    command: ["-config.file=/etc/loki/loki.yaml"]
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+
+  promtail:
+    image: grafana/promtail:3.3.2
+    volumes:
+      - ./docker/promtail/promtail.yaml:/etc/promtail/promtail.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command: ["-config.file=/etc/promtail/promtail.yaml"]
+    depends_on:
+      - loki
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    ports:
+      - "3300:3000"
+    depends_on:
+      - tempo
+      - prometheus
+      - loki
+    restart: unless-stopped
+
 volumes:
   postgres_data:
+  tempo_data:
+  grafana_data:
+  prometheus_data:
+  loki_data:

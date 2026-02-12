@@ -1,7 +1,7 @@
 """Event domain model for captured HTTP requests."""
 
 import base64
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import Column, Text, text
@@ -42,7 +42,10 @@ class Event(SQLModel, table=True):
     headers: dict[str, Any] = Field(default={}, sa_column=Column(JSONB, nullable=False))
     body_b64: str = Field(default="", sa_column=Column(Text, nullable=False))
     remote_ip: str | None = Field(default=None)
-    created_at: datetime = Field(sa_column_kwargs={"server_default": text("now()")})
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC).replace(tzinfo=None),
+        sa_column_kwargs={"server_default": text("now()")},
+    )
 
     @property
     def size_bytes(self) -> int:

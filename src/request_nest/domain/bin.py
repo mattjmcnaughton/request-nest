@@ -1,6 +1,6 @@
 """Bin domain model for webhook capture endpoints."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import text
 from sqlmodel import Field, SQLModel
@@ -25,7 +25,10 @@ class Bin(SQLModel, table=True):
 
     id: str = Field(primary_key=True)
     name: str | None = Field(default=None)
-    created_at: datetime = Field(sa_column_kwargs={"server_default": text("now()")})
+    created_at: datetime = Field(
+        default_factory=lambda: datetime.now(UTC).replace(tzinfo=None),
+        sa_column_kwargs={"server_default": text("now()")},
+    )
 
     def ingest_url(self, base_url: str) -> str:
         """Generate the public URL for capturing webhooks to this bin.

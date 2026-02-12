@@ -117,6 +117,14 @@ class IngestController:
         if event is None:
             raise not_found_error("Bin", bin_id)
 
-        logger.info("event_ingested", bin_id=bin_id, event_id=event.id, method=method)
+        logger.info(
+            "event_ingested",
+            bin_id=bin_id,
+            event_id=event.id,
+            method=method,
+            path=path,
+            body_size=len(body_bytes),
+            remote_ip=remote_ip,
+        )
 
         return IngestResponse(ok=True, event_id=event.id)

@@ -2,11 +2,20 @@
 
 from typing import Any
 
+from opentelemetry import metrics, trace
+
 from request_nest.domain import Bin
 from request_nest.dtos.v1 import BinResponse
 from request_nest.repositories import BinRepositoryProtocol
 
 __all__ = ["BinService"]
+
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+bins_created_counter = meter.create_counter(
+    "request_nest.bins.created",
+    description="Number of bins created",
+)
 
 
 class BinService:
@@ -57,9 +66,13 @@ class BinService:
         Returns:
             The created bin as a BinResponse DTO.
         """
-        bin_obj = await self._repository.create(session, name=name)
-        await session.commit()
-        return self._to_response(bin_obj, base_url)
+        with tracer.start_as_current_span("create_bin") as span:
+            bin_obj = await self._repository.create(session, name=name)
+            await session.commit()
+            span.set_attribute("bin.name", name or "")
+            span.set_attribute("bin.id", bin_obj.id)
+            bins_created_counter.add(1)
+            return self._to_response(bin_obj, base_url)
 
     async def get_bin(
         self,
@@ -77,10 +90,12 @@ class BinService:
         Returns:
             The bin as a BinResponse DTO, or None if not found.
         """
-        bin_obj = await self._repository.get_by_id(session, bin_id)
-        if bin_obj is None:
-            return None
-        return self._to_response(bin_obj, base_url)
+        with tracer.start_as_current_span("get_bin") as span:
+            span.set_attribute("bin.id", bin_id)
+            bin_obj = await self._repository.get_by_id(session, bin_id)
+            if bin_obj is None:
+                return None
+            return self._to_response(bin_obj, base_url)
 
     async def list_bins(
         self,
@@ -96,5 +111,7 @@ class BinService:
         Returns:
             A list of bins as BinResponse DTOs.
         """
-        bins = await self._repository.list_all(session)
-        return [self._to_response(bin_obj, base_url) for bin_obj in bins]
+        with tracer.start_as_current_span("list_bins") as span:
+            bins = await self._repository.list_all(session)
+            span.set_attribute("bins.count", len(bins))
+            return [self._to_response(bin_obj, base_url) for bin_obj in bins]

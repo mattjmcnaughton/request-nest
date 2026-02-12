@@ -1,5 +1,7 @@
 """Controller for Event API endpoints."""
 
+import structlog
+from opentelemetry import metrics
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from request_nest.dtos.v1 import EventDetail, EventListResponse
@@ -7,6 +9,18 @@ from request_nest.errors import not_found_error
 from request_nest.services import EventService
 
 __all__ = ["EventController"]
+
+logger = structlog.get_logger()
+
+meter = metrics.get_meter(__name__)
+events_viewed_counter = meter.create_counter(
+    "request_nest.events.viewed",
+    description="Number of event detail views",
+)
+bin_events_listed_counter = meter.create_counter(
+    "request_nest.bins.events_listed",
+    description="Number of bin event list views",
+)
 
 
 class EventController:
@@ -43,6 +57,8 @@ class EventController:
         result = await self._service.get_event(session, event_id=event_id)
         if result is None:
             raise not_found_error("Event", event_id)
+        logger.info("event_retrieved", event_id=event_id, bin_id=result.bin_id)
+        events_viewed_counter.add(1)
         return result
 
     async def list_events_by_bin(
@@ -67,4 +83,6 @@ class EventController:
         result = await self._service.list_events_by_bin(session, bin_id=bin_id, limit=limit)
         if result is None:
             raise not_found_error("Bin", bin_id)
+        logger.info("bin_events_listed", bin_id=bin_id, count=len(result))
+        bin_events_listed_counter.add(1)
         return EventListResponse(events=result)

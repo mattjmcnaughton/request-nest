@@ -3,11 +3,25 @@
 import base64
 from typing import Any
 
+from opentelemetry import metrics, trace
+from opentelemetry.trace import StatusCode
+
 from request_nest.domain import Event
 from request_nest.dtos.v1 import EventDetail, EventSummary
 from request_nest.repositories import BinRepositoryProtocol, EventRepositoryProtocol
 
 __all__ = ["EventService", "PayloadTooLargeError"]
+
+tracer = trace.get_tracer(__name__)
+meter = metrics.get_meter(__name__)
+events_ingested_counter = meter.create_counter(
+    "request_nest.events.ingested",
+    description="Number of events successfully ingested",
+)
+ingest_errors_counter = meter.create_counter(
+    "request_nest.events.ingest_errors",
+    description="Number of ingest errors (payload too large, bin not found)",
+)
 
 # Maximum allowed limit for listing events
 MAX_LIMIT = 100
@@ -75,10 +89,12 @@ class EventService:
         Returns:
             The event as an EventDetail DTO, or None if not found.
         """
-        event = await self._event_repository.get_by_id(session, event_id)
-        if event is None:
-            return None
-        return EventDetail.from_event(event)
+        with tracer.start_as_current_span("get_event") as span:
+            span.set_attribute("event.id", event_id)
+            event = await self._event_repository.get_by_id(session, event_id)
+            if event is None:
+                return None
+            return EventDetail.from_event(event)
 
     async def list_events_by_bin(
         self,
@@ -96,16 +112,20 @@ class EventService:
         Returns:
             A list of events as EventSummary DTOs, or None if the bin doesn't exist.
         """
-        # Verify the bin exists
-        bin_obj = await self._bin_repository.get_by_id(session, bin_id)
-        if bin_obj is None:
-            return None
+        with tracer.start_as_current_span("list_events_by_bin") as span:
+            span.set_attribute("bin.id", bin_id)
 
-        # Clamp limit to max
-        effective_limit = min(limit, MAX_LIMIT)
+            # Verify the bin exists
+            bin_obj = await self._bin_repository.get_by_id(session, bin_id)
+            if bin_obj is None:
+                return None
 
-        events = await self._event_repository.list_by_bin(session, bin_id, limit=effective_limit)
-        return [self._to_summary(event) for event in events]
+            # Clamp limit to max
+            effective_limit = min(limit, MAX_LIMIT)
+
+            events = await self._event_repository.list_by_bin(session, bin_id, limit=effective_limit)
+            span.set_attribute("events.count", len(events))
+            return [self._to_summary(event) for event in events]
 
     async def ingest_request(
         self,
@@ -138,26 +158,38 @@ class EventService:
         Raises:
             PayloadTooLargeError: If body_bytes exceeds max_body_size.
         """
-        body_size = len(body_bytes)
-        if body_size > max_body_size:
-            raise PayloadTooLargeError(max_size=max_body_size, actual_size=body_size)
+        with tracer.start_as_current_span("ingest_request") as span:
+            span.set_attribute("bin.id", bin_id)
+            span.set_attribute("http.method", method)
+            span.set_attribute("ingest.path", path)
 
-        bin_obj = await self._bin_repository.get_by_id(session, bin_id)
-        if bin_obj is None:
-            return None
+            body_size = len(body_bytes)
+            if body_size > max_body_size:
+                span.set_status(StatusCode.ERROR, "payload_too_large")
+                ingest_errors_counter.add(1, {"error.type": "payload_too_large"})
+                raise PayloadTooLargeError(max_size=max_body_size, actual_size=body_size)
 
-        body_b64 = base64.b64encode(body_bytes).decode("ascii")
+            bin_obj = await self._bin_repository.get_by_id(session, bin_id)
+            if bin_obj is None:
+                span.set_status(StatusCode.ERROR, "bin_not_found")
+                span.set_attribute("error.type", "bin_not_found")
+                ingest_errors_counter.add(1, {"error.type": "bin_not_found"})
+                return None
 
-        event = await self._event_repository.create(
-            session=session,
-            bin_id=bin_id,
-            method=method,
-            path=path,
-            query_params=query_params,
-            headers=headers,
-            body_b64=body_b64,
-            remote_ip=remote_ip,
-        )
+            body_b64 = base64.b64encode(body_bytes).decode("ascii")
 
-        await session.commit()
-        return event
+            event = await self._event_repository.create(
+                session=session,
+                bin_id=bin_id,
+                method=method,
+                path=path,
+                query_params=query_params,
+                headers=headers,
+                body_b64=body_b64,
+                remote_ip=remote_ip,
+            )
+
+            await session.commit()
+            span.set_attribute("event.id", event.id)
+            events_ingested_counter.add(1)
+            return event
